@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('backend.layouts.app')
 
 @section('content')
 <div class="container">
@@ -12,10 +12,29 @@
                         @csrf
 
                         <div class="form-group row">
+                            <label for="name" class="col-md-4 col-form-label text-md-right">Roles</label>
+
+                            <div class="col-md-6">
+                                <select id="role" type="text" class="form-control{{ $errors->has('role') ? ' is-invalid' : '' }}" name="role" required autofocus>
+                                    <option value="{{null}}">Select role for registration</option>
+                                    @foreach(getUserRoles() as $id => $role)
+                                        <option value="{{$id}}">{{ucfirst($role)}}</option>
+                                    @endforeach
+                                </select>
+
+                                @if ($errors->has('role'))
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $errors->first('role') }}</strong>
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
                             <label for="name" class="col-md-4 col-form-label text-md-right">{{ __('Name') }}</label>
 
                             <div class="col-md-6">
-                                <input id="name" type="text" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" name="name" value="{{ old('name') }}" required autofocus>
+                                <input id="name" type="text" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" name="name" value="{{ old('name') }}" required>
 
                                 @if ($errors->has('name'))
                                     <span class="invalid-feedback" role="alert">
