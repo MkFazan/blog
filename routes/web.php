@@ -17,4 +17,9 @@ Auth::routes();
 
 Route::get('/account', 'Backend\AccountController@index')->name('account');
 
-Route::get('/dashboard', 'Backend\AdminController@index')->name('dashboard');
+Route::group(['prefix' => 'dashboard', 'namespace' => 'Backend'], function (){
+    Route::get('/', 'AdminController@index')->name('dashboard');
+
+    Route::resource('users', 'UserController');
+});
+
