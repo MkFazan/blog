@@ -35,6 +35,29 @@
                     </li>
                 </ul>
             </li>
+            <li class="nav-item has-treeview">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-users-cog"></i>
+                    <p>
+                        Categories
+                        <i class="fa fa-angle-left right"></i>
+                    </p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a href="{{route('categories.index')}}" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            <p>List categories</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{route('categories.create')}}" class="nav-link">
+                            <i class="fas fa-user-plus"></i>
+                            <p>Create new</p>
+                        </a>
+                    </li>
+                </ul>
+            </li>
 
             <li class="nav-item">
                 <a href="{{ route('logout') }}" class="nav-link" onclick="event.preventDefault();

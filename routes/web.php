@@ -21,5 +21,6 @@ Route::group(['prefix' => 'dashboard', 'namespace' => 'Backend'], function (){
     Route::get('/', 'AdminController@index')->name('dashboard');
 
     Route::resource('users', 'UserController');
+    Route::resource('categories', 'CategoryController');
 });
 
