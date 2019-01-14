@@ -21,7 +21,7 @@
                             <div class="form-row">
                                 <div class="col-md-4 mb-3">
                                     <label for="validationCustom01">Name</label>
-                                    <input type="text" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" id="validationCustom01" placeholder="Name" name="name" value="{{isset($category) ? $category->name : old('email')}}" required>
+                                    <input type="text" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" id="validationCustom01" placeholder="Name" name="name" value="{{isset($category) ? $category->name : old('name')}}" required>
                                     <div class="invalid-feedback">
                                         @if ($errors->has('name'))
                                             {{ $errors->first('name') }}
@@ -32,7 +32,7 @@
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="validationCustom02">Description</label>
-                                    <input type="text" class="form-control{{ $errors->has('description') ? ' is-invalid' : '' }}" id="validationCustom02" placeholder="Description" name="description" value="{{isset($category) ? $category->email : old('email')}}" {{isset($user) ? 'readonly' : ''}} required>
+                                    <input type="text" class="form-control{{ $errors->has('description') ? ' is-invalid' : '' }}" id="validationCustom02" placeholder="Description" name="description" value="{{isset($category) ? $category->description : old('description')}}" required>
                                     <div class="invalid-feedback">
                                         @if ($errors->has('description'))
                                             {{ $errors->first('description') }}
@@ -46,7 +46,13 @@
                                     <select class="custom-select" name="parent_id" required>
                                         <option value="{{null}}">Is root</option>
                                         @foreach($categories as $id => $title)
-                                            <option value="{{$id}}" {{isset($category) ? (($category->parent_id == $id) ? 'selected' : '') : ''}}>{{$title}}</option>
+                                            @if(isset($category))
+                                            @if($category->id != $id && !in_array($id, $children))
+                                                <option value="{{$id}}" {{isset($category) ? (($category->parent_id == $id) ? 'selected' : '') : ''}}>{{$title}}</option>
+                                            @endif
+                                            @else
+                                                <option value="{{$id}}" {{isset($category) ? (($category->parent_id == $id) ? 'selected' : '') : ''}}>{{$title}}</option>
+                                            @endif
                                         @endforeach
                                     </select>
                                     <div class="invalid-feedback">
@@ -103,6 +109,11 @@
                         </form>
                     </div>
                 </div>
+            </div>
+            <div class="container">
+                <ul id="tree1">
+                    @php getNodes($nodes, ' - ') @endphp
+                </ul>
             </div>
         </div>
     </section>

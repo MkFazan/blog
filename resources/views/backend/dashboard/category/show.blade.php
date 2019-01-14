@@ -30,21 +30,20 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @foreach($categories as $key => $category)
                                 <tr>
-                                    <th scope="row">{{++$key}}</th>
+                                    <th scope="row">1</th>
                                     <th>{{$category->id}}</th>
                                     <td>{{$category->name}}</td>
                                     <td>{{$category->description}}</td>
                                     <td>
                                         <div class="btn-group-vertical">
-                                        @if($category->descendants)
-                                            @foreach($category->descendants as $item)
-                                                @if ($item->parent_id==$category->id)
-                                                    <p><a class="btn btn-outline-success" href="{{ route('categories.show', ['id' => $item->id]) }}">{{$item->name}}</a></p>
-                                                @endif
-                                            @endforeach
-                                        @endif
+                                            @if($category->descendants)
+                                                @foreach($category->descendants as $item)
+                                                    @if ($item->parent_id==$category->id)
+                                                        <p><a class="btn btn-outline-success" href="{{ route('categories.show', ['id' => $item->id]) }}">{{$item->name}}</a></p>
+                                                    @endif
+                                                @endforeach
+                                            @endif
                                         </div>
                                     </td>
                                     <td><a class="btn btn-warning" href="{{route('categories.edit', ['category' => $category->id])}}">Edit</a></td>
@@ -57,17 +56,9 @@
                                         </form>
                                     </td>
                                 </tr>
-                            @endforeach
                             </tbody>
                         </table>
 
-                        <div class="container align-items-center">
-                            <nav style="width: max-content; margin: auto;">
-                                <ul class="pagination pagination-sm">
-                                    {{ $categories->links() }}
-                                </ul>
-                            </nav>
-                        </div>
                     </div>
                 </div>
             </div>

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Models\Category;
-use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
@@ -17,9 +16,16 @@ class CategoryController extends Controller
     public function index()
     {
         return view('backend.dashboard.category.index', [
-            'categories' => Category::whereParentId(null)->paginate(config('app.paginate')),
-//            'nodes' => Category::get()->toTree()
+            'categories' => Category::whereIsRoot()->paginate(config('app.paginate')),
+            'nodes' => Category::whereIsRoot()->get(),
+        ]);
+    }
 
+    public function show(Category $category)
+    {
+        return view('backend.dashboard.category.show', [
+            'category' => $category,
+            'nodes' => Category::whereIsRoot()->get(),
         ]);
     }
 
@@ -31,7 +37,8 @@ class CategoryController extends Controller
     public function create()
     {
         return view('backend.dashboard.category.form', [
-            'categories' => Category::whereParentId(null)->pluck('name', 'id'),
+            'categories' => Category::pluck('name', 'id'),
+            'nodes' => Category::whereIsRoot()->get(),
             'title' => 'Create new'
         ]);
     }
@@ -44,7 +51,6 @@ class CategoryController extends Controller
      */
     public function store(StoreCategoryRequest $request)
     {
-//        dd($request->except('_token'));
         Category::create($request->except('_token'));
 
         return redirect()->route('categories.index')->with('success', 'Successfully created!');
@@ -58,9 +64,12 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        return view('faq::category.edit', [
+        return view('backend.dashboard.category.form', [
+            'categories' => Category::pluck('name', 'id'),
+            'nodes' => Category::whereIsRoot()->get(),
+            'children' => Category::whereDescendantOf($category)->pluck('id')->toArray(),
             'category' => $category,
-            'categories' => [null => 'Root'] + $this->faqServices->listCategoryTree('line')
+            'title' => 'Create new'
         ]);
     }
 
@@ -73,9 +82,9 @@ class CategoryController extends Controller
      */
     public function update(StoreCategoryRequest $request, Category $category)
     {
-        $this->faqServices->updateCategory($category, $request->except('_token', '_method'));
+        $category->update($request->except('_token', '_method'));
 
-        return redirect()->route('faq.categories.index')->with('success', 'Successfully saved!');
+        return redirect()->route('categories.index')->with('success', 'Successfully saved!');
     }
 
     /**
@@ -85,13 +94,16 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        if ($this->validateForDeleted($category)) {
-            $category->delete();
+//        if ($this->validateForDeleted($category)) {
+//            $category->delete();
+//
+//            return redirect()->route('categories.index')->with('success', 'Successfully deleted!');
+//        } else {
+//            return back()->with('error', 'Category can not be deleted because it has articles');
+//        }
+        $category->delete();
 
-            return redirect()->route('faq.categories.index')->with('success', 'Successfully deleted!');
-        } else {
-            return back()->with('error', 'Category can not be deleted because it has articles');
-        }
+        return redirect()->route('categories.index')->with('error', 'Category can not be deleted because it has articles');
     }
 
     /**

@@ -37,7 +37,7 @@
             </li>
             <li class="nav-item has-treeview">
                 <a href="#" class="nav-link">
-                    <i class="fas fa-users-cog"></i>
+                    <i class="fas fa-layer-group"></i>
                     <p>
                         Categories
                         <i class="fa fa-angle-left right"></i>
@@ -46,13 +46,13 @@
                 <ul class="nav nav-treeview">
                     <li class="nav-item">
                         <a href="{{route('categories.index')}}" class="nav-link">
-                            <i class="fas fa-users"></i>
+                            <i class="fas fa-bars"></i>
                             <p>List categories</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="{{route('categories.create')}}" class="nav-link">
-                            <i class="fas fa-user-plus"></i>
+                            <i class="fas fa-plus"></i>
                             <p>Create new</p>
                         </a>
                     </li>
