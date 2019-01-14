@@ -24,7 +24,8 @@ class AddImageGalleryRequuest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'article' => 'required|integer|exists:articles,id|min:1|max:' . config('app.primary_key_max_value'),
+            'file' => 'required|file|mimes:jpeg,jpg,png|max:' . config('app.max_file_size'),
         ];
     }
 }

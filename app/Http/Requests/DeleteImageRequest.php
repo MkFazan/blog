@@ -24,8 +24,8 @@ class DeleteImageRequest extends FormRequest
     public function rules()
     {
         return [
-            'article_id' => 'required|integer|',
-            'image_id' => 'required|integer|',
+            'article_id' => 'required|integer|exists:article_images,article_id|min:1|max:' . config('app.primary_key_max_value'),
+            'image_id' => 'required|integer|exists:article_images,image_id|min:1|max:' . config('app.primary_key_max_value'),
         ];
     }
 }

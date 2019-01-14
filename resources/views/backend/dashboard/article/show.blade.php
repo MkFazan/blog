@@ -161,7 +161,7 @@
                     article: $("input[name='article_id']").val()
                 };
             },
-            allowedFileExtensions: ['jpg', 'png', 'gif'],
+            allowedFileExtensions: ['jpg', 'png', 'gif', 'jpeg'],
             overwriteInitial: false,
             maxFileSize:2000,
             maxFilesNum: 10,
