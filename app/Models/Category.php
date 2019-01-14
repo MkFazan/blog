@@ -17,4 +17,12 @@ class Category extends Model
         'meta_keywords',
         'parent_id',
     ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function article()
+    {
+        return $this->belongsToMany(Article::class, 'article_categories');
+    }
 }

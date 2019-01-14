@@ -21,6 +21,10 @@ class CategoryController extends Controller
         ]);
     }
 
+    /**
+     * @param Category $category
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function show(Category $category)
     {
         return view('backend.dashboard.category.show', [

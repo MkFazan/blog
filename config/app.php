@@ -2,7 +2,8 @@
 
 return [
 
-    'paginate' => 2,
+    'paginate' => env('PAGINATE', 2),
+    'max_file_size' => env('MAX_FILE_SIZE', 10485760),
     /*
     |--------------------------------------------------------------------------
     | Application Name

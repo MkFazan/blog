@@ -22,5 +22,8 @@ Route::group(['prefix' => 'dashboard', 'namespace' => 'Backend'], function (){
 
     Route::resource('users', 'UserController');
     Route::resource('categories', 'CategoryController');
+    Route::resource('articles', 'ArticleController');
+    Route::post('/add-img', 'ArticleController@addImage')->name('articles.gallery.add.img');
+    Route::post('/delete-img', 'ArticleController@deleteImage')->name('delete.image.in.gallery');
 });
 
