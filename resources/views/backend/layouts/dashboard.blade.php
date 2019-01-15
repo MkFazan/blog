@@ -44,7 +44,18 @@
             <span class="brand-text font-weight-light">{{ config('app.name', 'Laravel') }}</span>
         </a>
 
-        @include('backend.dashboard.partial.sidebar')
+        @switch (true)
+            @case (auth()->user()->isAdmin()):
+                @include('backend.dashboard.partial.sidebar')
+                @break;
+            @case (auth()->user()->isBlogger());
+                @include('backend.account.blogger.partial.sidebar')
+                @break;
+            @case (auth()->user()->isReader());
+                @include('backend.account.reader.partial.sidebar')
+                @break;
+        @endswitch
+
 
     </aside>
 

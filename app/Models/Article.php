@@ -14,6 +14,8 @@ class Article extends Model
         'meta_title',
         'meta_keywords',
         'parent_id',
+        'author_id',
+        'status',
     ];
 
     /**

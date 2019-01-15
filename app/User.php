@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\Article;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -57,7 +58,32 @@ class User extends Authenticatable
         self::READER => 'reader',
     ];
 
+    /**
+     * @return bool
+     */
     public function isAdmin(){
         return ($this->role == User::ADMIN) ? true : false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBlogger(){
+        return ($this->role == User::BLOGGER) ? true : false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isReader(){
+        return ($this->role == User::READER) ? true : false;
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function favorite()
+    {
+        return $this->belongsToMany(Article::class, 'article_favorites');
     }
 }
