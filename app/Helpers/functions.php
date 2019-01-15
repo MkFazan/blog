@@ -2,6 +2,9 @@
 
 use App\User;
 
+const STATUS_DISABLED = 0;
+const STATUS_ACTIVE = 1;
+
 function getUserRoles(){
     return User::$userRoles;
 }

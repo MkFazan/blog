@@ -31,7 +31,7 @@
                 </h3>
                 <ul class="nav nav-pills ml-auto p-2">
                     <li class="nav-item">
-                        <a class="nav-link active" href="{{route('articles.create')}}" >Create new category</a>
+                        <a class="nav-link active" href="{{route('articles.create')}}" >Create new artilce</a>
                     </li>
                 </ul>
             </div>
@@ -41,8 +41,7 @@
                         <table class="table table-hover table-dark">
                             <thead>
                             <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Id</th>
+                                <th scope="col">Logo</th>
                                 <th scope="col">Name</th>
                                 <th scope="col">Description</th>
                                 <th scope="col">Categories</th>
@@ -51,8 +50,7 @@
                             </thead>
                             <tbody>
                             <tr>
-                                <th scope="row">1</th>
-                                <th>{{$article->id}}</th>
+                                <th><img class="my_style" src="{{$article->logotype->url}}"></th>
                                 <td><a class="btn btn-outline-light btn-sm" href="#">{{$article->name}}</a></td>
                                 <td>{{$article->description}}</td>
                                 <td>
@@ -84,11 +82,6 @@
                     <i class="fa fa-pie-chart mr-1"></i>
                     Article gallery image
                 </h3>
-                <ul class="nav nav-pills ml-auto p-2">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{route('articles.gallery.add.img')}}" >Create new category</a>
-                    </li>
-                </ul>
             </div>
             <div class="card-body">
                 <div class="container">

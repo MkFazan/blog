@@ -98,16 +98,13 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-//        if ($this->validateForDeleted($category)) {
-//            $category->delete();
-//
-//            return redirect()->route('categories.index')->with('success', 'Successfully deleted!');
-//        } else {
-//            return back()->with('error', 'Category can not be deleted because it has articles');
-//        }
-        $category->delete();
+        if ($this->validateForDeleted($category)) {
+            $category->delete();
 
-        return redirect()->route('categories.index')->with('error', 'Category can not be deleted because it has articles');
+            return redirect()->route('categories.index')->with('error', 'Category can not be deleted because it has articles');
+        } else {
+            return back()->with('error', 'Category can not be deleted because it has articles');
+        }
     }
 
     /**
@@ -116,9 +113,9 @@ class CategoryController extends Controller
      */
     public function validateForDeleted($category)
     {
-        $category->load('articles');
+        $category->load('article');
 
-        if (count($category->articles) == 0 || count($category->descendants)) {
+        if (count($category->article) == 0 || count($category->descendants)) {
             $validation = true;
             foreach ($category->descendants as $child) {
                 $status = $this->getArticleForCategory($child);
@@ -133,5 +130,16 @@ class CategoryController extends Controller
         } else {
             return false;
         }
+    }
+
+    /**
+     * @param $category
+     * @return mixed
+     */
+    public function getArticleForCategory($category)
+    {
+        $category->load('article');
+
+        return $category->article;
     }
 }

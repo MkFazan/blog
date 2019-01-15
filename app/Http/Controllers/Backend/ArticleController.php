@@ -23,7 +23,7 @@ class ArticleController extends Controller
     public function index()
     {
         return view('backend.dashboard.article.index', [
-            'articles' => Article::with('logo', 'gallery', 'category')->paginate(config('app.paginate')),
+            'articles' => Article::with('logotype', 'gallery', 'category')->paginate(config('app.paginate')),
         ]);
     }
 
@@ -34,7 +34,7 @@ class ArticleController extends Controller
     public function show(Article $article)
     {
         return view('backend.dashboard.article.show', [
-            'article' => $article,
+            'article' => $article->load('logotype'),
         ]);
     }
 
@@ -65,17 +65,7 @@ class ArticleController extends Controller
 
         DB::beginTransaction();
         try {
-
-            $img = $data['logo'];
-            $img_name = time() . $img->getClientOriginalName();
-            $file_path = 'app/public/uploads/';
-            $img->move(storage_path($file_path), $img_name);
-            $image = Image::create([
-                'name' => $img_name,
-                'display_name' => $data['name'],
-                'url' => config('app.url') . '/storage/uploads/' . $img_name
-            ]);
-
+            $image = $this->saveImage($data['logo'], $data['name']);
             $data['logo'] = $image->id;
 
             $article = Article::create($data);
@@ -93,9 +83,7 @@ class ArticleController extends Controller
         } catch (\Throwable $e) {
             DB::rollback();
 
-            throw $e;
-
-//            return back()->with('error', 'Error! Not found!');
+            return back()->with('error', 'Error! Not found!');
         }
     }
 
@@ -131,17 +119,7 @@ class ArticleController extends Controller
         try {
 
             if (isset($data['logo'])) {
-                $img = $data['logo'];
-                $img_name = time() . $img->getClientOriginalName();
-                $file_path = 'app/public/uploads/';
-                $img->move(storage_path($file_path), $img_name);
-
-                $image = Image::create([
-                    'name' => $img_name,
-                    'display_name' => $data['name'],
-                    'url' => config('app.url') . '/storage/uploads/' . $img_name
-                ]);
-
+                $image = $this->saveImage($data['logo'], $data['name']);
                 $data['logo'] = $image->id;
             }
 
@@ -181,11 +159,21 @@ class ArticleController extends Controller
      */
     public function destroy(Article $article)
     {
-        ArticleCategory::whereArticleId($article->id)->delete();
-        ArticleImage::whereArticleId($article->id)->delete();
-        $article->delete();
+        DB::beginTransaction();
+        try {
+            ArticleCategory::whereArticleId($article->id)->delete();
+            ArticleImage::whereArticleId($article->id)->delete();
+            $article->delete();
 
-        return redirect()->route('articles.index')->with('error', 'Category can not be deleted because it has articles');
+            DB::commit();
+
+            return redirect()->route('articles.index')->with('success', 'Article deleted');
+
+        } catch (\Throwable $e) {
+            DB::rollback();
+
+            return back()->with('error', 'Error! Not found!');
+        }
     }
 
     /**
@@ -194,33 +182,79 @@ class ArticleController extends Controller
      */
     public function addImage(AddImageGalleryRequuest $requuest)
     {
-        $article = Article::find($requuest->article);
-        $img = request()->file;
-        $img_name = time() .  request()->file->getClientOriginalName();
-        $file_path = 'app/public/uploads/';
-        $img->move(storage_path($file_path), $img_name);
+        DB::beginTransaction();
+        try {
+            $image = $this->saveImageGallery(Article::find($requuest->article), $requuest->file);
 
-        $image = Image::create([
-            'name' => $img_name,
-            'display_name' => $article->name,
-            'url' => config('app.url') . '/storage/uploads/' . $img_name
-        ]);
+            DB::commit();
+
+            return response()->json(['uploaded' => '/upload/'.$image->name]);
+
+        } catch (\Throwable $e) {
+            DB::rollback();
+
+            return back()->with('error', 'Error! Not found!');
+        }
+    }
+
+    /**
+     * @param DeleteImageRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function deleteImage(DeleteImageRequest $request)
+    {
+        DB::beginTransaction();
+        try {
+            $data = $request->all();
+
+            ArticleImage::whereImageId($data['image_id'])->whereArticleId($data['article_id'])->delete();
+
+            DB::commit();
+
+            return back()->with('success', 'Delete image in gallery');
+
+        } catch (\Throwable $e) {
+            DB::rollback();
+
+            return back()->with('error', 'Error! Not found!');
+        }
+    }
+
+    /**
+     * @param Article $article
+     * @param $img
+     * @return mixed
+     */
+    public function saveImageGallery(Article $article, $img)
+    {
+        $image = $this->saveImage($img, $article->name);
 
         ArticleImage::create([
             'image_id' => $image->id,
             'article_id' => $article->id
         ]);
 
-        return response()->json(['uploaded' => '/upload/'.$img_name]);
+        return $image;
     }
 
-    public function deleteImage(DeleteImageRequest $request)
+    /**
+     * @param $img
+     * @param $display_name
+     * @return mixed
+     */
+    public function saveImage($img, $display_name)
     {
-        $data = $request->all();
+        $img_name = time() . $img->getClientOriginalName();
+        $file_path = 'app/public/uploads/';
+        $img->move(storage_path($file_path), $img_name);
 
-        ArticleImage::whereImageId($data['image_id'])->whereArticleId($data['article_id'])->delete();
+        $image = Image::create([
+            'name' => $img_name,
+            'display_name' => $display_name,
+            'url' => config('app.url') . '/storage/uploads/' . $img_name
+        ]);
 
-        return back()->with('success', 'Delete image in gallery');
-
+        return $image;
     }
+
 }

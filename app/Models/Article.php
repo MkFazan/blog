@@ -19,7 +19,7 @@ class Article extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function logo()
+    public function logotype()
     {
         return $this->hasOne(Image::class, 'id', 'logo');
     }

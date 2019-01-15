@@ -66,17 +66,6 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      *
      * @param User $user
@@ -132,8 +121,18 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        $user->delete();
+        DB::beginTransaction();
+        try {
+            $user->delete();
 
-        return redirect()->route('users.index')->with('success', 'Used deleted!');
+            DB::commit();
+
+            return redirect()->route('users.index')->with('success', 'Used deleted!');
+
+        } catch (\Throwable $e) {
+            DB::rollback();
+
+            return back()->with('error', 'Error!' . $e);
+        }
     }
 }
