@@ -72,10 +72,29 @@
                                 </ul>
                             </nav>
                         </div>
+                        <div class="container align-items-center">
+                                <div class="form-group">
+                                    <label>Articles in page</label>
+                                    <select onchange="reload(this.value)">
+                                        <option value="{{config('app.paginate')}}">{{config('app.paginate')}}</option>
+                                        <option {{$paginate==20 ? 'selected' : ''}} value="20">20</option>
+                                        <option {{$paginate==50 ? 'selected' : ''}} value="50">50</option>
+                                        <option {{$paginate==100 ? 'selected' : ''}} value="100">100</option>
+                                    </select>
+                                </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
+@endsection
+
+@section('script')
+    <script>
+        function reload(val) {
+            window.location = '{{route('my.article')}}' + '/' + val;
+        }
+    </script>
 @endsection

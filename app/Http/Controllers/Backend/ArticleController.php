@@ -6,15 +6,35 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AddImageGalleryRequuest;
 use App\Http\Requests\DeleteImageRequest;
 use App\Http\Requests\StoreArticleRequest;
+use App\Http\Requests\UpdateArticleRequest;
 use App\Models\Article;
-use App\Models\ArticleCategory;
-use App\Models\ArticleImage;
 use App\Models\Category;
-use App\Models\Image;
+use App\Repositories\ArticleRepository;
+use App\Services\ArticleService;
 use Illuminate\Support\Facades\DB;
 
 class ArticleController extends Controller
 {
+    /**
+     * @var ArticleService
+     */
+    private $articleService;
+    /**
+     * @var ArticleRepository
+     */
+    private $articleRepository;
+
+    /**
+     * ArticleController constructor.
+     * @param ArticleService $articleService
+     * @param ArticleRepository $articleRepository
+     */
+    public function __construct(ArticleService $articleService, ArticleRepository $articleRepository)
+    {
+        $this->articleService = $articleService;
+        $this->articleRepository = $articleRepository;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -61,20 +81,9 @@ class ArticleController extends Controller
      */
     public function store(StoreArticleRequest $request)
     {
-        $data = $request->except('_token');
-
         DB::beginTransaction();
         try {
-            $image = $this->saveImage($data['logo'], $data['name']);
-            $data['logo'] = $image->id;
-
-            $article = Article::create($data);
-            foreach ($data['categories'] as $category) {
-                ArticleCategory::create([
-                    'article_id' => $article->id,
-                    'category_id' => $category
-                ]);
-            }
+            $this->articleService->store($request->except('_token'));
 
             DB::commit();
 
@@ -111,36 +120,11 @@ class ArticleController extends Controller
      * @return \Illuminate\Http\Response
      * @throws \Throwable
      */
-    public function update(StoreArticleRequest $request, Article $article)
+    public function update(UpdateArticleRequest $request, Article $article)
     {
-        $data = $request->except('_token', '_method', 'MAX_FILE_SIZE');
-
         DB::beginTransaction();
         try {
-
-            if (isset($data['logo'])) {
-                $image = $this->saveImage($data['logo'], $data['name']);
-                $data['logo'] = $image->id;
-            }
-
-            $article->update($data);
-
-            $old_categories = $article->category->pluck('id')->toArray();
-            $new_categories = $data['categories'];
-            foreach ($new_categories as $category) {
-                if (in_array($category, $old_categories) && ($key = array_search($category, $old_categories)) !== false){
-                        unset($old_categories[$key]);
-                }else{
-                    ArticleCategory::create([
-                        'article_id' => $article->id,
-                        'category_id' => $category
-                    ]);
-                }
-            }
-            if (!empty($old_categories)){
-                ArticleCategory::whereArticleId($article->id)->whereIn('category_id', $old_categories)->delete();
-            }
-
+            $this->articleService->update($request->except('_token', '_method', 'MAX_FILE_SIZE'), $article);
             DB::commit();
 
             return redirect()->route('articles.index')->with('success', 'Successfully saved!');
@@ -161,10 +145,7 @@ class ArticleController extends Controller
     {
         DB::beginTransaction();
         try {
-            ArticleCategory::whereArticleId($article->id)->delete();
-            ArticleImage::whereArticleId($article->id)->delete();
-            $article->delete();
-
+            $this->articleService->destroy($article);
             DB::commit();
 
             return redirect()->route('articles.index')->with('success', 'Article deleted');
@@ -184,8 +165,7 @@ class ArticleController extends Controller
     {
         DB::beginTransaction();
         try {
-            $image = $this->saveImageGallery(Article::find($requuest->article), $requuest->file);
-
+            $image = $this->articleService->saveImageGallery(Article::find($requuest->article), $requuest->file);
             DB::commit();
 
             return response()->json(['uploaded' => '/upload/'.$image->name]);
@@ -205,10 +185,7 @@ class ArticleController extends Controller
     {
         DB::beginTransaction();
         try {
-            $data = $request->all();
-
-            ArticleImage::whereImageId($data['image_id'])->whereArticleId($data['article_id'])->delete();
-
+            $this->articleRepository->deleteImage($request->all());
             DB::commit();
 
             return back()->with('success', 'Delete image in gallery');
@@ -218,43 +195,6 @@ class ArticleController extends Controller
 
             return back()->with('error', 'Error! Not found!');
         }
-    }
-
-    /**
-     * @param Article $article
-     * @param $img
-     * @return mixed
-     */
-    public function saveImageGallery(Article $article, $img)
-    {
-        $image = $this->saveImage($img, $article->name);
-
-        ArticleImage::create([
-            'image_id' => $image->id,
-            'article_id' => $article->id
-        ]);
-
-        return $image;
-    }
-
-    /**
-     * @param $img
-     * @param $display_name
-     * @return mixed
-     */
-    public function saveImage($img, $display_name)
-    {
-        $img_name = time() . $img->getClientOriginalName();
-        $file_path = 'app/public/uploads/';
-        $img->move(storage_path($file_path), $img_name);
-
-        $image = Image::create([
-            'name' => $img_name,
-            'display_name' => $display_name,
-            'url' => config('app.url') . '/storage/uploads/' . $img_name
-        ]);
-
-        return $image;
     }
 
 }

@@ -9,7 +9,6 @@ use App\Models\Article;
 use App\Models\Category;
 use App\Repositories\ArticleRepository;
 use App\Services\ArticleService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AccountController extends Controller
@@ -54,7 +53,8 @@ class AccountController extends Controller
     {
         return view('backend.account.blogger.article.index', [
             'articles' => $this->articleRepository->getMyArticle($paginate),
-            'title' => 'My articles'
+            'title' => 'My articles',
+            'paginate' => $paginate
         ]);
     }
 
@@ -64,9 +64,11 @@ class AccountController extends Controller
      */
     public function listMyFavoriteArticle($paginate = false)
     {
+        dd($this->articleRepository->getMyFavoriteArticle($paginate));
         return view('backend.account.blogger.article.favorite', [
-            'articles' => $this->articleRepository->getMyFavoriteArticle($paginate)->favorite,
-            'title' => 'My favorite articles'
+            'articles' => $this->articleRepository->getMyFavoriteArticle($paginate),
+            'title' => 'My favorite articles',
+            'paginate' => $paginate
         ]);
     }
 
