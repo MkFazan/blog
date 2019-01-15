@@ -59,12 +59,31 @@ class AccountController extends Controller
     }
 
     /**
+     * @param Article $article
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function changeStatusFavorite(Article $article)
+    {
+        DB::beginTransaction();
+        try {
+            $status = $this->articleService->changeFavoriteStatus($article);
+            DB::commit();
+
+            return back()->with('success', $status);
+
+        } catch (\Throwable $e) {
+            DB::rollback();
+
+            return back()->with('error', 'Error! Not found!');
+        }
+    }
+
+    /**
      * @param bool $paginate
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function listMyFavoriteArticle($paginate = false)
     {
-        dd($this->articleRepository->getMyFavoriteArticle($paginate));
         return view('backend.account.blogger.article.favorite', [
             'articles' => $this->articleRepository->getMyFavoriteArticle($paginate),
             'title' => 'My favorite articles',

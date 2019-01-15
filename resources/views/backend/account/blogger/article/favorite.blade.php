@@ -37,24 +37,16 @@
                                 <tr>
                                     <th scope="row">{{++$key}}</th>
                                     <th><img class="my_style" src="{{$article->logotype->url}}"></th>
-                                    <td><a class="btn btn-outline-light btn-sm" href="{{route('articles.show', ['id' => $article->id])}}">{{$article->name}}</a></td>
+                                    <td><a class="btn btn-outline-light btn-sm" href="#">{{$article->name}}</a></td>
                                     <td>{{$article->description}}</td>
                                     <td>
                                         <div class="btn-group">
                                             @foreach($article->category as $category)
-                                                <a href="{{route('categories.show', ['id' => $category->id])}}" class="btn btn-info btn-sm">{{$category->name}}</a>
+                                                <a href="#" class="btn btn-info btn-sm">{{$category->name}}</a>
                                             @endforeach
                                         </div>
                                     </td>
-                                    <td><a class="btn btn-warning" href="{{route('articles.edit', ['article' => $article->id])}}">Edit</a></td>
-                                    <td>
-                                        <form id="delete_{{$article->id}}" method="post" action="{{route('articles.destroy', ['article' => $article->id])}}">
-                                            @method('DELETE')
-                                            @csrf
-                                            <a class="btn btn-danger" style="cursor: pointer"
-                                               onclick="document.getElementById('delete_{{$article->id}}').submit()">Delete</a>
-                                        </form>
-                                    </td>
+                                    <td><a class="btn btn-danger" href="{{route('change.status.favorite.article', ['article' => $article->id])}}">Delete</a></td>
                                 </tr>
                             @endforeach
                             </tbody>

@@ -21,6 +21,7 @@ Route::group(['prefix' => 'account', 'namespace' => 'Backend'], function (){
     Route::get('/', 'AccountController@index')->name('account');
     Route::get('/my-article/{paginate?}', 'AccountController@listMyArticle')->name('my.article');
     Route::get('/my-favorite-article/{paginate?}', 'AccountController@listMyFavoriteArticle')->name('my.favorite.article');
+    Route::get('/change-status-favorite/{article}', 'AccountController@changeStatusFavorite')->name('change.status.favorite.article');
 
     Route::resource('articles', 'AccountController', ['as' => 'blogger']);
 });

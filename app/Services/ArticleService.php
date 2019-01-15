@@ -13,9 +13,24 @@ use App\Models\Article;
 use App\Models\ArticleCategory;
 use App\Models\ArticleImage;
 use App\Models\Image;
+use App\Repositories\ArticleRepository;
 
 class ArticleService
 {
+    /**
+     * @var ArticleRepository
+     */
+    private $articleRepository;
+
+    /**
+     * ArticleService constructor.
+     * @param ArticleRepository $articleRepository
+     */
+    public function __construct(ArticleRepository $articleRepository)
+    {
+        $this->articleRepository = $articleRepository;
+    }
+
     /**
      * @param $data
      * @return mixed
@@ -114,5 +129,20 @@ class ArticleService
         ]);
 
         return $image;
+    }
+
+    public function changeFavoriteStatus(Article $article)
+    {
+        $status = $this->articleRepository->getFavoriteStatus($article);
+
+        if (is_null($status)){
+            $this->articleRepository->addArticleToFavorite($article);
+
+            return 'Added article to favorite!';
+        }else{
+            $this->articleRepository->deleteArticleToFavorite($article);
+
+            return 'Deleted favorite article!';
+        }
     }
 }

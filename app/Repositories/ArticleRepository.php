@@ -10,6 +10,7 @@ namespace App\Repositories;
 
 
 use App\Models\Article;
+use App\Models\ArticleFavorite;
 use App\Models\ArticleImage;
 
 class ArticleRepository
@@ -29,7 +30,7 @@ class ArticleRepository
      */
     public function getMyFavoriteArticle($paginate = false)
     {
-        return auth()->user()->load('favorite')->favorite->pluck('id'); //->paginate($paginate ? $paginate : config('app.paginate'));
+        return Article::with('logotype', 'gallery', 'category')->whereIn('id', auth()->user()->load('favorite')->favorite->pluck('id'))->paginate($paginate ? $paginate : config('app.paginate'));
     }
 
     /**
@@ -39,5 +40,35 @@ class ArticleRepository
     public function deleteImage($data)
     {
         return ArticleImage::whereImageId($data['image_id'])->whereArticleId($data['article_id'])->delete();
+    }
+
+    /**
+     * @param Article $article
+     * @return mixed
+     */
+    public function getFavoriteStatus(Article $article)
+    {
+        return ArticleFavorite::whereUserId(auth()->user()->id)->whereArticleId($article->id)->first();
+    }
+
+    /**
+     * @param Article $article
+     * @return mixed
+     */
+    public function deleteArticleToFavorite(Article $article)
+    {
+        return ArticleFavorite::whereUserId(auth()->user()->id)->whereArticleId($article->id)->delete();
+    }
+
+    /**
+     * @param Article $article
+     * @return mixed
+     */
+    public function addArticleToFavorite(Article $article)
+    {
+        return ArticleFavorite::create([
+            'user_id' => auth()->user()->id,
+            'article_id' => $article->id,
+        ]);
     }
 }
