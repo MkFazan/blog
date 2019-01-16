@@ -107,7 +107,7 @@ class PageController extends Controller
     public function article(Article $article)
     {
         return view('frontend.pages.article',[
-            'article' => $article->load('gallery', 'logotype', 'author', 'category'),
+            'article' => $article->load('gallery', 'logotype', 'author', 'category', 'comments', 'comments.author', 'comments.answer'),
             'favoriteArticles' => $this->articleRepository->getFavoriteArticles(),
 
             'categories' => $this->categoryRepository->getCategories(),

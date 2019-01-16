@@ -5,6 +5,8 @@ Route::get('/categories/{paginate?}', 'Frontend\PageController@categories')->nam
 Route::get('/category/{category}/{paginate?}', 'Frontend\PageController@category')->name('category');
 Route::get('/article/{article}', 'Frontend\PageController@article')->name('article');
 
+Route::resource('comments', 'Frontend\CommentController');
+
 Auth::routes();
 
 Route::group(['prefix' => 'dashboard', 'namespace' => 'Backend'], function (){

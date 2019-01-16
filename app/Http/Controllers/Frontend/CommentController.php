@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Backend;
+namespace App\Http\Controllers\Frontend;
 
 
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
 use App\Services\CommentService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CommentController extends Controller
 {
@@ -52,7 +53,19 @@ class CommentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        DB::beginTransaction();
+        try {
+            $this->commentService->store($request->except('_token'));
+
+            DB::commit();
+
+            return back()->with('success', 'Comment saved');
+
+        } catch (\Throwable $e) {
+            DB::rollback();
+
+            return back()->with('error', 'Error! Not found!');
+        }
     }
 
     /**

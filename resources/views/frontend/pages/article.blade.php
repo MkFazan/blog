@@ -44,12 +44,13 @@
             </div>
             <div class="card w-auto m-2">
                 @include('frontend.pages.comment',[
-                    'comments' => null
+                    'comments' => $article->comments,
+                    'article_id' => $article->id
                 ])
 
                 @include('frontend.partial.comment_form_article',[
-                    'child' => false,
-                    'article_id' => null,
+                    'parent_id' => null,
+                    'article_id' => $article->id,
                 ])
             </div>
         </div>

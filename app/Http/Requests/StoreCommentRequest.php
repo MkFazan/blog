@@ -26,8 +26,7 @@ class StoreCommentRequest extends FormRequest
         return [
             'text' => 'required|string|max:500',
             'parent_id' => 'integer|exists:comments,id|nullable|min:1|max:' . config('app.primary_key_max_value'),
-            'article_id' => 'integer|exists:articles,id|nullable|min:1|max:' . config('app.primary_key_max_value'),
-            'author_id' => 'required|exists:users,id|min:1|max:' . config('app.primary_key_max_value'),
+            'article_id' => 'integer|exists:articles,id|min:1|max:' . config('app.primary_key_max_value'),
             'status' => 'integer|nullable',
         ];
     }

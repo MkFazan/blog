@@ -9,7 +9,14 @@
 namespace App\Services;
 
 
+use App\Models\Comment;
+
 class CommentService
 {
+    public function store($data)
+    {
+        $data['author_id'] = auth()->user()->id;
 
+        return Comment::create($data);
+    }
 }
