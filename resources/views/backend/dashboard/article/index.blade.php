@@ -35,6 +35,8 @@
                                 <th scope="col">Description</th>
                                 <th scope="col">Categories</th>
                                 <th scope="col" colspan="2"></th>
+                                <th scope="col">Best</th>
+
                             </tr>
                             </thead>
                             <tbody>
@@ -59,6 +61,9 @@
                                             <a class="btn btn-danger" style="cursor: pointer"
                                                onclick="document.getElementById('delete_{{$article->id}}').submit()">Delete</a>
                                         </form>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-outline-light btn-sm" href="{{route('change.status.favorite.article', ['id' => $article->id])}}">{{in_array($article->id, $best) ? 'Delete' : 'Add'}}</a>
                                     </td>
                                 </tr>
                             @endforeach

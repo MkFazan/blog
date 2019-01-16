@@ -86,4 +86,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Article::class, 'article_favorites');
     }
+
+    public function articles()
+    {
+        return $this->belongsTo(Article::class, 'author_id', 'id');
+    }
 }

@@ -12,6 +12,7 @@ namespace App\Repositories;
 use App\Models\Article;
 use App\Models\ArticleFavorite;
 use App\Models\ArticleImage;
+use App\User;
 
 class ArticleRepository
 {
@@ -70,5 +71,18 @@ class ArticleRepository
             'user_id' => auth()->user()->id,
             'article_id' => $article->id,
         ]);
+    }
+
+    public function getBestArticles()
+    {
+        $array = User::whereRole(User::ADMIN)
+            ->join('article_favorites', 'article_favorites.user_id', 'users.id')
+            ->select([
+                'article_id as id'
+            ])
+            ->pluck('id')
+            ->toArray();
+
+        return Article::with('logotype', 'author')->whereIn('id', $array)->get();
     }
 }

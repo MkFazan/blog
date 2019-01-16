@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Article extends Model
@@ -40,5 +41,10 @@ class Article extends Model
     public function category()
     {
         return $this->belongsToMany(Category::class, 'article_categories');
+    }
+
+    public function author()
+    {
+        return $this->hasOne(User::class, 'id', 'author_id');
     }
 }

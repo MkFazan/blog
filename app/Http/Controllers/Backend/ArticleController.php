@@ -44,6 +44,7 @@ class ArticleController extends Controller
     {
         return view('backend.dashboard.article.index', [
             'articles' => Article::with('logotype', 'gallery', 'category')->paginate(config('app.paginate')),
+            'best' => auth()->user()->favorite->pluck('id')->toArray()
         ]);
     }
 
