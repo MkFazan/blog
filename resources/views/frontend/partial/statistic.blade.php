@@ -49,7 +49,7 @@
                                 <div class="card w-auto">
                                     <img src="{{$article->logotype->url}}" class="card-img-top w-25 h-25 m-2" alt="...">
                                     <div class="card-body">
-                                        <h5 class="card-title"><a href="" class="btn btn-light">{{ucfirst($article->name)}}</a></h5>
+                                        <h5 class="card-title"><a href="{{route('article', ['article' => $article->id])}}" class="btn btn-light">{{ucfirst($article->name)}}</a></h5>
                                         <p class="card-text">{{mb_strimwidth($article->description, 0, 50, "...")}}</p>
                                         <p class="card-text">Author: {{$article->author->name}}</p>
                                     </div>

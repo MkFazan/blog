@@ -4,6 +4,9 @@
 
     <div class="container">
         <div class="card">
+            <div class="card-header">
+                <h3>Category: {{isset($category) ? ucfirst($category->name) : 'All'}}</h3>
+            </div>
             <div class="card-body">
                 <div class="row">
                     @foreach($articles as $article)
@@ -12,7 +15,7 @@
                                 <div class="card w-auto">
                                     <img src="{{$article->logotype->url}}" class="card-img-top w-25 h-25 m-2" alt="...">
                                     <div class="card-body">
-                                        <h5 class="card-title"><a href="" class="btn btn-light">{{ucfirst($article->name)}}</a></h5>
+                                        <h5 class="card-title"><a href="{{route('article', ['article' => $article->id])}}" class="btn btn-light">{{ucfirst($article->name)}}</a></h5>
                                         <p class="card-text">Categories:
                                             @foreach($article->category as $category)
                                                 <span class="badge badge-info">{{ucfirst($category->name) . ' '}}</span>

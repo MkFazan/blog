@@ -3,6 +3,7 @@
 Route::get('/', 'Frontend\PageController@home')->name('home');
 Route::get('/categories/{paginate?}', 'Frontend\PageController@categories')->name('categories');
 Route::get('/category/{category}/{paginate?}', 'Frontend\PageController@category')->name('category');
+Route::get('/article/{article}', 'Frontend\PageController@article')->name('article');
 
 Auth::routes();
 

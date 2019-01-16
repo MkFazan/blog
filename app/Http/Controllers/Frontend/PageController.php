@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Models\Article;
 use App\Models\Category;
 use App\Repositories\ArticleRepository;
 use App\Repositories\CategoryRepository;
@@ -70,7 +71,7 @@ class PageController extends Controller
     public function categories($paginate = false)
     {
         return view('frontend.pages.category',[
-            'articles' => $this->articleRepository->getArticlesForCategory($paginate ? $paginate : config('app.paginate', false)),
+            'articles' => $this->articleRepository->getArticlesForCategory($paginate ? $paginate : config('app.paginate'), false),
             'favoriteArticles' => $this->articleRepository->getFavoriteArticles(),
 
             'categories' => $this->categoryRepository->getCategories(),
@@ -89,7 +90,7 @@ class PageController extends Controller
     {
         return view('frontend.pages.category',[
             'category' => $category,
-            'articles' => $this->articleRepository->getArticlesForCategory($paginate ? $paginate : config('app.paginate', $category->id)),
+            'articles' => $this->articleRepository->getArticlesForCategory($paginate ? $paginate : config('app.paginate'), $category->id),
             'favoriteArticles' => $this->articleRepository->getFavoriteArticles(),
 
             'categories' => $this->categoryRepository->getCategories(),
@@ -98,4 +99,20 @@ class PageController extends Controller
             'route' => Route::currentRouteName()
         ]);
     }
+
+    /**
+     * @param Article $article
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function article(Article $article)
+    {
+        return view('frontend.pages.article',[
+            'article' => $article->load('gallery', 'logotype', 'author', 'category'),
+            'favoriteArticles' => $this->articleRepository->getFavoriteArticles(),
+
+            'categories' => $this->categoryRepository->getCategories(),
+            'pages' => $this->pageRepository->getPageActive(),
+        ]);
+    }
+
 }

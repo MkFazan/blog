@@ -98,7 +98,7 @@ class ArticleRepository
     public function getArticlesForCategory($paginate, $category = false)
     {
         if ($category){
-            $article_ids = ArticleCategory::whereCategorieId($category)->pluck('article_id')->toArray();
+            $article_ids = ArticleCategory::whereCategoryId($category)->pluck('article_id')->toArray();
 
             return Article::with('gallery', 'logotype', 'author', 'category')
                 ->whereIn('id', $article_ids)
