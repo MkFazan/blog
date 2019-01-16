@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Models\Category;
 use App\Repositories\ArticleRepository;
 use App\Repositories\CategoryRepository;
 use App\Repositories\PageRepository;
 use App\Repositories\UserRepository;
 use App\Services\PageService;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Route;
 
 class PageController extends Controller
 {
@@ -49,12 +51,51 @@ class PageController extends Controller
         $this->userRepository = $userRepository;
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function home(){
         return view('frontend.pages.home',[
             'pages' => $this->pageRepository->getPageActive(),
             'categories' => $this->categoryRepository->getCategories(),
             'bestArticles' => $this->articleRepository->getBestArticles(),
             'bloggers' => $this->userRepository->getBloggers()
+        ]);
+    }
+
+    /**
+     * @param bool $paginate
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function categories($paginate = false)
+    {
+        return view('frontend.pages.category',[
+            'articles' => $this->articleRepository->getArticlesForCategory($paginate ? $paginate : config('app.paginate', false)),
+            'favoriteArticles' => $this->articleRepository->getFavoriteArticles(),
+
+            'categories' => $this->categoryRepository->getCategories(),
+            'pages' => $this->pageRepository->getPageActive(),
+            'paginate' => $paginate ? $paginate : config('app.paginate'),
+            'route' => Route::currentRouteName()
+        ]);
+    }
+
+    /**
+     * @param Category $category
+     * @param bool $paginate
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function category(Category $category, $paginate = false)
+    {
+        return view('frontend.pages.category',[
+            'category' => $category,
+            'articles' => $this->articleRepository->getArticlesForCategory($paginate ? $paginate : config('app.paginate', $category->id)),
+            'favoriteArticles' => $this->articleRepository->getFavoriteArticles(),
+
+            'categories' => $this->categoryRepository->getCategories(),
+            'pages' => $this->pageRepository->getPageActive(),
+            'paginate' => $paginate ? $paginate : config('app.paginate'),
+            'route' => Route::currentRouteName()
         ]);
     }
 }

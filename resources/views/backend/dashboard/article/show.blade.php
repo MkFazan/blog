@@ -52,7 +52,7 @@
                             <tr>
                                 <th><img class="my_style" src="{{$article->logotype->url}}"></th>
                                 <td><a class="btn btn-outline-light btn-sm" href="#">{{$article->name}}</a></td>
-                                <td>{{$article->description}}</td>
+                                <td>{{mb_strimwidth($article->description, 0, 10, "...")}}</td>
                                 <td>
                                     <div class="btn-group">
                                         @foreach($article->category as $category)

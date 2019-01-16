@@ -14,10 +14,10 @@
                     Categories
                 </a>
                 <div class="dropdown-menu badge-dark" aria-labelledby="navbarDropdownMenuLink">
-                    <a class="dropdown-item badge-dark" href="#">All</a>
+                    <a class="dropdown-item badge-dark" href="{{route('categories')}}">All</a>
                     <div class="dropdown-divider badge-dark"></div>
                     @foreach($categories as $id => $category)
-                        <a class="dropdown-item badge-dark" href="#">{{$category}}</a>
+                        <a class="dropdown-item badge-dark" href="{{route('category', ['category' => $id])}}">{{$category}}</a>
                     @endforeach
                 </div>
             </li>

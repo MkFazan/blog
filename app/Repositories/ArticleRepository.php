@@ -10,6 +10,7 @@ namespace App\Repositories;
 
 
 use App\Models\Article;
+use App\Models\ArticleCategory;
 use App\Models\ArticleFavorite;
 use App\Models\ArticleImage;
 use App\User;
@@ -73,6 +74,9 @@ class ArticleRepository
         ]);
     }
 
+    /**
+     * @return Article[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
+     */
     public function getBestArticles()
     {
         $array = User::whereRole(User::ADMIN)
@@ -84,5 +88,32 @@ class ArticleRepository
             ->toArray();
 
         return Article::with('logotype', 'author')->whereIn('id', $array)->get();
+    }
+
+    /**
+     * @param $paginate
+     * @param bool $category
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function getArticlesForCategory($paginate, $category = false)
+    {
+        if ($category){
+            $article_ids = ArticleCategory::whereCategorieId($category)->pluck('article_id')->toArray();
+
+            return Article::with('gallery', 'logotype', 'author', 'category')
+                ->whereIn('id', $article_ids)
+                ->paginate($paginate);
+
+        }else{
+            return Article::with('gallery', 'logotype', 'author', 'category')->paginate($paginate);
+        }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFavoriteArticles()
+    {
+        return auth()->user()->favorite->pluck('id')->toArray();
     }
 }
