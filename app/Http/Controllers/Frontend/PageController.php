@@ -102,4 +102,11 @@ class PageController extends Controller
         ]);
     }
 
+    public function page($slug)
+    {
+        return view('frontend.pages.page_template',[
+            'page' => $this->pageRepository->getPageForSlug($slug)
+        ]);
+    }
+
 }

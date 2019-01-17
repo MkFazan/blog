@@ -13,5 +13,6 @@ class Page extends Model
         'meta_description',
         'meta_keywords',
         'status',
+        'slug',
     ];
 }

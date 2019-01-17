@@ -37,12 +37,12 @@
                                 <tr>
                                     <th scope="row">{{++$key}}</th>
                                     <th><img class="my_style" src="{{$article->logotype->url}}"></th>
-                                    <td><a class="btn btn-outline-light btn-sm" href="#">{{$article->name}}</a></td>
+                                    <td><a class="btn btn-outline-light btn-sm" href="{{route('article', ['article' => $article->id])}}">{{$article->name}}</a></td>
                                     <td>{{$article->description}}</td>
                                     <td>
                                         <div class="btn-group">
                                             @foreach($article->category as $category)
-                                                <a href="#" class="btn btn-info btn-sm">{{$category->name}}</a>
+                                                <a href="{{route('category', ['category' => $category->id])}}" class="btn btn-info btn-sm">{{$category->name}}</a>
                                             @endforeach
                                         </div>
                                     </td>

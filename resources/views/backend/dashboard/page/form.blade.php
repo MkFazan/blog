@@ -19,9 +19,9 @@
                                 @method('PUT')
                             @endif
                             <div class="form-row">
-                                <div class="col-md-4 mb-3">
-                                    <label for="validationCustom01">Name</label>
-                                    <input type="text" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" id="validationCustom01" placeholder="Name" name="name" value="{{isset($page) ? $page->name : old('name')}}" required>
+                                <div class="col-md-6 mb-3">
+                                    <label for="name">Name</label>
+                                    <input type="text" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" id="name" placeholder="Name" name="name" value="{{isset($page) ? $page->name : old('name')}}" required>
                                     <div class="invalid-feedback">
                                         @if ($errors->has('name'))
                                             {{ $errors->first('name') }}
@@ -30,9 +30,9 @@
                                         @endif
                                     </div>
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="validationCustom01">Meta title</label>
-                                    <input type="text" class="form-control{{ $errors->has('meta_title') ? ' is-invalid' : '' }}" id="validationCustom01" placeholder="Meta title" name="meta_title" value="{{isset($page) ? $page->meta_title : old('meta_title')}}" required>
+                                <div class="col-md-6 mb-3">
+                                    <label for="meta_title">Meta title</label>
+                                    <input type="text" class="form-control{{ $errors->has('meta_title') ? ' is-invalid' : '' }}" id="meta_title" placeholder="Meta title" name="meta_title" value="{{isset($page) ? $page->meta_title : old('meta_title')}}" required>
                                     <div class="invalid-feedback">
                                         @if ($errors->has('meta_title'))
                                             {{ $errors->first('meta_title') }}
@@ -41,9 +41,22 @@
                                         @endif
                                     </div>
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="validationCustom01">Meta keywords</label>
-                                    <input type="text" class="form-control{{ $errors->has('meta_keywords') ? ' is-invalid' : '' }}" id="validationCustom01" placeholder="Name" name="meta_keywords" value="{{isset($page) ? $page->meta_keywords : old('meta_keywords')}}" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="slug">Slug</label>
+                                    <input type="text" class="form-control{{ $errors->has('slug') ? ' is-invalid' : '' }}" id="slug" placeholder="Slug" name="slug" value="{{isset($page) ? $page->slug : old('slug')}}" required>
+                                    <div class="invalid-feedback">
+                                        @if ($errors->has('slug'))
+                                            {{ $errors->first('slug') }}
+                                        @else
+                                            Name required!
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="meta_keywords">Meta keywords</label>
+                                    <input type="text" class="form-control{{ $errors->has('meta_keywords') ? ' is-invalid' : '' }}" id="meta_keywords" placeholder="Name" name="meta_keywords" value="{{isset($page) ? $page->meta_keywords : old('meta_keywords')}}" required>
                                     <div class="invalid-feedback">
                                         @if ($errors->has('meta_keywords'))
                                             {{ $errors->first('meta_keywords') }}

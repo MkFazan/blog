@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
 
 class StorePageRequest extends FormRequest
 {
@@ -21,7 +22,7 @@ class StorePageRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(Request $request)
     {
         return [
             'name' => 'required|string|max:50',
@@ -30,6 +31,7 @@ class StorePageRequest extends FormRequest
             'meta_description' => 'required|string|max:150',
             'meta_keywords' => 'required|string|max:255',
             'status' => 'integer|nullable',
+            'slug' => 'required|string|max:100|unique:pages,slug',
         ];
     }
 }

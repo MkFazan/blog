@@ -21,9 +21,9 @@
                     @endforeach
                 </div>
             </li>
-            @foreach(getPagesForNavMenu() as $id => $page)
+            @foreach(getPagesForNavMenu() as $slug => $page)
                 <li class="nav-item">
-                    <a class="nav-link" href="#">{{$page}}<span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="{{route('custom.page', ['slug' => $slug])}}">{{$page}}<span class="sr-only">(current)</span></a>
                 </li>
             @endforeach
         </ul>

@@ -5,6 +5,8 @@ Route::get('/categories/{paginate?}', 'Frontend\PageController@categories')->nam
 Route::get('/category/{category}/{paginate?}', 'Frontend\PageController@category')->name('category');
 Route::get('/article/{article}', 'Frontend\PageController@article')->name('article');
 
+Route::get('/page/{slug}', ['as' => 'custom.page', 'uses' => 'Frontend\PageController@page']);
+
 Route::post('comment-store', 'Frontend\CommentController@store')->name('comment.store');
 
 Auth::routes();
