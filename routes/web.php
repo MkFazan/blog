@@ -6,6 +6,8 @@ Route::get('/category/{category}/{paginate?}', 'Frontend\PageController@category
 Route::get('/article/{article}', 'Frontend\PageController@article')->name('article');
 
 Route::get('/page/{slug}', ['as' => 'custom.page', 'uses' => 'Frontend\PageController@page']);
+Route::get('/search', 'Backend\SearchController@basicSearch')->name('search.articles');
+Route::post('/filter', 'Backend\SearchController@filter')->name('filter');
 
 Route::post('comment-store', 'Frontend\CommentController@store')->name('comment.store');
 

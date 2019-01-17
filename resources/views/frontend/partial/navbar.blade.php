@@ -27,9 +27,12 @@
                 </li>
             @endforeach
         </ul>
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        <form class="form-inline my-2 my-lg-0" id="filter_article" method="post" action="{{route('filter')}}">
+            @csrf
+            <select class="js-example-data-ajax form-control w-100 float-right" onchange="runArticle(this.value)">
+                <option>Search article for ......</option>
+            </select>
+                <a class="btn btn-outline-success my-2 my-lg-0" style="cursor:pointer;" onclick="document.getElementById('filter_article').submit()">Filter</a>
         </form>
     </div>
     <div>
@@ -63,3 +66,62 @@
         </ul>
     </div>
 </nav>
+
+@section('script')
+
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+    <script>
+        $('.js-example-basic-multiple').select2();
+
+        $(".js-example-data-ajax").select2({
+            ajax: {
+                url: "{{route('search.articles')}}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                }, processResults: function (data, params) {
+                    params.page = params.page || 1;
+
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 30) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            placeholder: 'Search for a repository',
+            escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+            minimumInputLength: 1,
+            templateResult: formatRepo,
+            templateSelection: formatRepoSelection
+        });
+
+        function formatRepo (repo) {
+            if (repo.loading) {
+                return repo.text;
+            }
+
+            var markup = "<div class='select2-result-repository clearfix'>" + repo.name + "</div>";
+
+            return markup;
+        }
+
+        function formatRepoSelection (repo) {
+            return repo.name || repo.text;
+        }
+
+        function runArticle(url) {
+            window.location = url;
+        }
+    </script>
+
+@endsection

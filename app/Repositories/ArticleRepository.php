@@ -116,4 +116,29 @@ class ArticleRepository
     {
         return auth()->user()->favorite->pluck('id')->toArray();
     }
+
+    /**
+     * @param $data
+     * @return mixed
+     */
+    public function basicSearch($data)
+    {
+        return Article::whereStatus(STATUS_ACTIVE)
+            ->where('name', 'like', '%' . $data . '%')
+            ->where('description', 'like', '%' . $data . '%')
+            ->where('meta_title', 'like', '%' . $data . '%')
+            ->where('meta_description', 'like', '%' . $data . '%')
+            ->where('meta_keywords', 'like', '%' . $data . '%')
+            ->get();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAllArticles()
+    {
+        return Article::with('author', 'category')->whereStatus(STATUS_ACTIVE)
+
+            ->get();
+    }
 }
