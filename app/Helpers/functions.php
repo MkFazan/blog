@@ -1,14 +1,23 @@
 <?php
 
+use App\Repositories\CategoryRepository;
+use App\Repositories\PageRepository;
 use App\User;
 
 const STATUS_DISABLED = 0;
 const STATUS_ACTIVE = 1;
 
+/**
+ * @return array
+ */
 function getUserRoles(){
     return User::$userRoles;
 }
 
+/**
+ * @param $categories
+ * @param string $prefix
+ */
 function getNodes($categories, $prefix = ' - ')
 {
     foreach ($categories as $category) {
@@ -19,6 +28,11 @@ function getNodes($categories, $prefix = ' - ')
 }
 
 
+/**
+ * @param $categories
+ * @param string $prefix
+ * @param $selected
+ */
 function getNodesSelect($categories, $prefix = ' - ', $selected)
 {
     foreach ($categories as $category) {
@@ -32,4 +46,20 @@ function getNodesSelect($categories, $prefix = ' - ', $selected)
 
         getNodesSelect($category->children, $prefix . ' - ', $selected);
     }
+}
+
+/**
+ * @return mixed
+ */
+function getPagesForNavMenu()
+{
+    return PageRepository::getPageActive();
+}
+
+/**
+ * @return mixed
+ */
+function getCategoryForNavMenu()
+{
+    return CategoryRepository::getCategories();
 }

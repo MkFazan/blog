@@ -17,8 +17,8 @@
                                     <div class="card-body">
                                         <h5 class="card-title"><a href="{{route('article', ['article' => $article->id])}}" class="btn btn-light">{{ucfirst($article->name)}}</a></h5>
                                         <p class="card-text">Categories:
-                                            @foreach($article->category as $category)
-                                                <span class="badge badge-info">{{ucfirst($category->name) . ' '}}</span>
+                                            @foreach($article->category as $cat)
+                                                <span class="badge badge-info">{{ucfirst($cat->name) . ' '}}</span>
                                             @endforeach
                                         </p>
                                         <p class="card-text">Author: {{$article->author->name}}</p>
@@ -59,11 +59,11 @@
 @section('script')
     <script>
         function reload(val) {
-            var route = '{{$route}}';
-            if (route == 'categories'){
+            var route = '{{isset($category) ? 'true' : 'false'}}';
+            if (route){
                 window.location = '{{route('categories')}}' + '/' + val;
             } else {
-                window.location = '{{route('category', ['category' => $category->id])}}' + '/' + val;
+                window.location = '{{route('category', ['category' => $route])}}' + '/' + val;
             }
         }
     </script>

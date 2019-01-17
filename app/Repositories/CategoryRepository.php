@@ -13,7 +13,7 @@ use App\Models\Category;
 
 class CategoryRepository
 {
-    public function getCategories()
+    public static function getCategories()
     {
         return Category::pluck('name', 'id');
     }

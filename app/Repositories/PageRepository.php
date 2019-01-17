@@ -13,7 +13,7 @@ use App\Models\Page;
 
 class PageRepository
 {
-    public function getPageActive()
+    public static function getPageActive()
     {
         return Page::whereStatus(STATUS_ACTIVE)->pluck('name', 'id');
     }

@@ -16,12 +16,12 @@
                 <div class="dropdown-menu badge-dark" aria-labelledby="navbarDropdownMenuLink">
                     <a class="dropdown-item badge-dark" href="{{route('categories')}}">All</a>
                     <div class="dropdown-divider badge-dark"></div>
-                    @foreach($categories as $id => $category)
+                    @foreach(getCategoryForNavMenu() as $id => $category)
                         <a class="dropdown-item badge-dark" href="{{route('category', ['category' => $id])}}">{{$category}}</a>
                     @endforeach
                 </div>
             </li>
-            @foreach($pages as $id => $page)
+            @foreach(getPagesForNavMenu() as $id => $page)
                 <li class="nav-item">
                     <a class="nav-link" href="#">{{$page}}<span class="sr-only">(current)</span></a>
                 </li>

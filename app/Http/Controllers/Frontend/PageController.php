@@ -11,7 +11,6 @@ use App\Repositories\PageRepository;
 use App\Repositories\UserRepository;
 use App\Services\PageService;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Route;
 
 class PageController extends Controller
 {
@@ -53,8 +52,6 @@ class PageController extends Controller
      */
     public function home(){
         return view('frontend.pages.home',[
-            'pages' => $this->pageRepository->getPageActive(),
-            'categories' => $this->categoryRepository->getCategories(),
             'bestArticles' => $this->articleRepository->getBestArticles(),
             'bloggers' => $this->userRepository->getBloggers()
         ]);
@@ -70,10 +67,8 @@ class PageController extends Controller
             'articles' => $this->articleRepository->getArticlesForCategory($paginate ? $paginate : config('app.paginate'), false),
             'favoriteArticles' => $this->articleRepository->getFavoriteArticles(),
 
-            'categories' => $this->categoryRepository->getCategories(),
-            'pages' => $this->pageRepository->getPageActive(),
             'paginate' => $paginate ? $paginate : config('app.paginate'),
-            'route' => Route::currentRouteName()
+            'route' => false
         ]);
     }
 
@@ -89,10 +84,8 @@ class PageController extends Controller
             'articles' => $this->articleRepository->getArticlesForCategory($paginate ? $paginate : config('app.paginate'), $category->id),
             'favoriteArticles' => $this->articleRepository->getFavoriteArticles(),
 
-            'categories' => $this->categoryRepository->getCategories(),
-            'pages' => $this->pageRepository->getPageActive(),
             'paginate' => $paginate ? $paginate : config('app.paginate'),
-            'route' => Route::currentRouteName()
+            'route' => $category->id
         ]);
     }
 
@@ -106,9 +99,6 @@ class PageController extends Controller
             'article' => $article->load('gallery', 'logotype', 'author', 'category', 'comments', 'comments.author'),
             'favoriteArticles' => $this->articleRepository->getFavoriteArticles(),
             'answerComments' => $this->commentRepository->getAnswers(),
-
-            'categories' => $this->categoryRepository->getCategories(),
-            'pages' => $this->pageRepository->getPageActive(),
         ]);
     }
 
