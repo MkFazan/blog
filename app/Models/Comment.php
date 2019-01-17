@@ -22,12 +22,4 @@ class Comment extends Model
     {
         return $this->hasOne(User::class, 'id', 'author_id');
     }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function answer()
-    {
-        return $this->hasMany(Comment::class, 'id', 'parent_id');
-    }
 }

@@ -107,6 +107,30 @@
                 </ul>
             </li>
 
+            <li class="nav-item has-treeview">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-newspaper"></i>
+                    <p>
+                        Comments
+                        <i class="fa fa-angle-left right"></i>
+                    </p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a href="{{route('comments.index')}}" class="nav-link">
+                            <i class="fas fa-bars"></i>
+                            <p>List all comments</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{route('comments.moderation')}}" class="nav-link">
+                            <i class="fas fa-bars"></i>
+                            <p>List comments for moderation</p>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="nav-item">
                 <a href="{{ route('logout') }}" class="nav-link" onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">

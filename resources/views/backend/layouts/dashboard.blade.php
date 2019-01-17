@@ -67,6 +67,24 @@
                         <h1 class="m-0 text-dark">Dashboard</h1>
                     </div>
                 </div>
+                @if(session('success'))
+                    <div class="row mb-2">
+                        <div class="col-sm-12">
+                            <div class="alert alert-success" role="alert">
+                                {{session('success')}}
+                            </div>
+                        </div>
+                    </div>
+                @endif
+                @if(session('error'))
+                    <div class="row mb-2">
+                        <div class="col-sm-12">
+                            <div class="alert alert-danger" role="alert">
+                                {{session('error')}}
+                            </div>
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
         <section class="content">

@@ -30,8 +30,8 @@
                     </h2>
                 </div>
                 <div id="collapse_{{$comment->id}}" class="collapse" aria-labelledby="heading_{{$comment->id}}" data-parent="#accordionExample">
-                    @if(!empty($comment->answer))
-                    @foreach($comment->answer as $answer)
+                    @if(!empty($answerComments))
+                    @foreach($answerComments as $answer)
                         @if($answer->parent_id == $comment->id)
                         <div class="card-body">
                             <div class="container">
@@ -41,17 +41,17 @@
                                             <div class="col-4">
                                                 <div class="card m-3">
                                                     <div class="container m-2">
-                                                        <p class="card-title">Author</p>
+                                                        <p class="card-title">{{$answer->author->name}}</p>
                                                     </div>
                                                     <ul class="list-group list-group-flush">
-                                                        <li class="list-group-item">16.12.19</li>
+                                                        <li class="list-group-item">{{$answer->created_at}}</li>
                                                     </ul>
                                                 </div>
                                             </div>
                                             <div class="col-8">
                                                 <div class="card m-3">
                                                     <div class="container m-2">
-                                                        <p class="card-title">fefwe</p>
+                                                        <p class="card-title">{{$answer->text}}</p>
                                                     </div>
                                                 </div>
                                             </div>

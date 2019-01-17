@@ -5,7 +5,7 @@ Route::get('/categories/{paginate?}', 'Frontend\PageController@categories')->nam
 Route::get('/category/{category}/{paginate?}', 'Frontend\PageController@category')->name('category');
 Route::get('/article/{article}', 'Frontend\PageController@article')->name('article');
 
-Route::resource('comments', 'Frontend\CommentController');
+Route::post('comment-store', 'Frontend\CommentController@store')->name('comment.store');
 
 Auth::routes();
 
@@ -20,6 +20,11 @@ Route::group(['prefix' => 'dashboard', 'namespace' => 'Backend'], function (){
     Route::post('/delete-img', 'ArticleController@deleteImage')->name('delete.image.in.gallery');
 
     Route::resource('pages', 'PageController');
+
+    Route::get('comments', 'CommentController@index')->name('comments.index');
+    Route::get('moderation-comments', 'CommentController@moderation')->name('comments.moderation');
+    Route::get('comment-approve/{comment}', 'CommentController@approve')->name('comments.approve');
+    Route::get('comment-delete/{comment}', 'CommentController@destroy')->name('comments.delete');
 });
 
 Route::group(['prefix' => 'account', 'namespace' => 'Backend'], function (){

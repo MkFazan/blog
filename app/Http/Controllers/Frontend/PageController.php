@@ -6,6 +6,7 @@ use App\Models\Article;
 use App\Models\Category;
 use App\Repositories\ArticleRepository;
 use App\Repositories\CategoryRepository;
+use App\Repositories\CommentRepository;
 use App\Repositories\PageRepository;
 use App\Repositories\UserRepository;
 use App\Services\PageService;
@@ -14,26 +15,12 @@ use Illuminate\Support\Facades\Route;
 
 class PageController extends Controller
 {
-    /**
-     * @var PageService
-     */
     private $pageService;
-    /**
-     * @var PageRepository
-     */
     private $pageRepository;
-    /**
-     * @var CategoryRepository
-     */
     private $categoryRepository;
-    /**
-     * @var ArticleRepository
-     */
     private $articleRepository;
-    /**
-     * @var UserRepository
-     */
     private $userRepository;
+    private $commentRepository;
 
     /**
      * PageController constructor.
@@ -42,14 +29,23 @@ class PageController extends Controller
      * @param CategoryRepository $categoryRepository
      * @param ArticleRepository $articleRepository
      * @param UserRepository $userRepository
+     * @param CommentRepository $commentRepository
      */
-    public function __construct(PageService $pageService, PageRepository $pageRepository, CategoryRepository $categoryRepository, ArticleRepository $articleRepository, UserRepository $userRepository)
+    public function __construct(
+        PageService $pageService,
+        PageRepository $pageRepository,
+        CategoryRepository $categoryRepository,
+        ArticleRepository $articleRepository,
+        UserRepository $userRepository,
+        CommentRepository $commentRepository
+    )
     {
         $this->pageService = $pageService;
         $this->pageRepository = $pageRepository;
         $this->categoryRepository = $categoryRepository;
         $this->articleRepository = $articleRepository;
         $this->userRepository = $userRepository;
+        $this->commentRepository = $commentRepository;
     }
 
     /**
@@ -107,8 +103,9 @@ class PageController extends Controller
     public function article(Article $article)
     {
         return view('frontend.pages.article',[
-            'article' => $article->load('gallery', 'logotype', 'author', 'category', 'comments', 'comments.author', 'comments.answer'),
+            'article' => $article->load('gallery', 'logotype', 'author', 'category', 'comments', 'comments.author'),
             'favoriteArticles' => $this->articleRepository->getFavoriteArticles(),
+            'answerComments' => $this->commentRepository->getAnswers(),
 
             'categories' => $this->categoryRepository->getCategories(),
             'pages' => $this->pageRepository->getPageActive(),
