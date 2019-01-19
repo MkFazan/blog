@@ -63,12 +63,14 @@
                             @endif
                     @endforeach
                     @endif
-                    <div class="card ml-5 pt-2">
-                        @include('frontend.partial.comment_form_article', [
-                            'parent_id' => $comment->id,
-                            'article_id' => $article_id,
-                        ])
-                    </div>
+                    @auth
+                        <div class="card ml-5 pt-2">
+                            @include('frontend.partial.comment_form_article', [
+                                'parent_id' => $comment->id,
+                                'article_id' => $article_id,
+                            ])
+                        </div>
+                    @endauth
                 </div>
             </div>
         </div>

@@ -101,11 +101,14 @@ class ArticleRepository
             $article_ids = ArticleCategory::whereCategoryId($category)->pluck('article_id')->toArray();
 
             return Article::with('gallery', 'logotype', 'author', 'category')
+                ->whereStatus(STATUS_ACTIVE)
                 ->whereIn('id', $article_ids)
                 ->paginate($paginate);
 
         }else{
-            return Article::with('gallery', 'logotype', 'author', 'category')->paginate($paginate);
+            return Article::with('gallery', 'logotype', 'author', 'category')
+                ->whereStatus(STATUS_ACTIVE)
+                ->paginate($paginate);
         }
     }
 
@@ -114,7 +117,11 @@ class ArticleRepository
      */
     public function getFavoriteArticles()
     {
-        return auth()->user()->favorite->pluck('id')->toArray();
+        if(empty(auth()->user())){
+            return [];
+        }else{
+            return auth()->user()->favorite->pluck('id')->toArray();
+        }
     }
 
     /**

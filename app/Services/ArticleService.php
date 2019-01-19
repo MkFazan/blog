@@ -170,6 +170,10 @@ class ArticleService
         ];
     }
 
+    /**
+     * @param $data
+     * @return mixed
+     */
     public function filter($data)
     {
         $articles = $this->articleRepository->getAllArticles();
@@ -204,9 +208,21 @@ class ArticleService
                 return false !== stristr($item->name, $meta_keywords);
             });
         }
-//        if (!empty($data['author_name'])){
-//
-//        }
+        if (!empty($data['author_name'])){
+            $author = $data['author_name'];
+            $articles = $articles->filter(function ($item) use ($author) {
+                return false !== stristr($item->author->name, $author);
+            });
+        }
+        if (isset($data['categories'])){
+            if (!empty($data['categories'])){;
+                $categories = $data['categories'];
+                $articles = $articles->filter(function ($item) use ($categories) {
+                    $category = $item->category->pluck('id')->toArray();
+                    return false !== !empty(array_uintersect($categories, $category, "strcasecmp"));
+                });
+            }
+        }
 
         return $articles;
     }

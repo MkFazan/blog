@@ -54,9 +54,6 @@
         </div>
     </div>
 
-@endsection
-
-@section('script')
     <script>
         function reload(val) {
             var route = '{{isset($category) ? 'true' : 'false'}}';
@@ -67,4 +64,5 @@
             }
         }
     </script>
+
 @endsection

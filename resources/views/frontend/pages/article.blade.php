@@ -47,11 +47,14 @@
                     'comments' => $article->comments,
                     'article_id' => $article->id
                 ])
-
-                @include('frontend.partial.comment_form_article',[
-                    'parent_id' => null,
-                    'article_id' => $article->id,
-                ])
+                @auth
+                    @include('frontend.partial.comment_form_article',[
+                        'parent_id' => null,
+                        'article_id' => $article->id,
+                    ])
+                @else
+                    <h3 class="text-center">Please login to add comments</h3>
+                @endauth
             </div>
         </div>
     </div>

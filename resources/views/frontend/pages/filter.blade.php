@@ -70,9 +70,6 @@
                                         <p class="card-text">Author: {{$article->author->name}}</p>
                                         <p class="card-text">{{$article->created_at}}</p>
                                     </div>
-                                    <div class="card-body">
-                                        <a href="{{route('change.status.favorite.article', ['id' => $article->id])}}" class="card-link">{{in_array($article->id, $favoriteArticles) ? 'Delete' : 'Add'}}</a>
-                                    </div>
                                 </div>
                             </div>
                         </div>

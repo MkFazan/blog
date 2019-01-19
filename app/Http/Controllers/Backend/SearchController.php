@@ -41,6 +41,10 @@ class SearchController extends Controller
         return response()->json($this->articleService->basicSearch($query));
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function filter(Request $request)
     {
         $articles = $this->articleService->filter($request->all());

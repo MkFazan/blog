@@ -30,9 +30,9 @@
         <form class="form-inline my-2 my-lg-0" id="filter_article" method="post" action="{{route('filter')}}">
             @csrf
             <select class="js-example-data-ajax form-control w-100 float-right" onchange="runArticle(this.value)">
-                <option>Search article for ......</option>
+                <option>Search article</option>
             </select>
-                <a class="btn btn-outline-success my-2 my-lg-0" style="cursor:pointer;" onclick="document.getElementById('filter_article').submit()">Filter</a>
+            <a class="btn btn-outline-success ml-1 my-2 my-lg-0" style="cursor:pointer;" onclick="document.getElementById('filter_article').submit()">Filter</a>
         </form>
     </div>
     <div>
