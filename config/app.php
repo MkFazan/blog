@@ -2,7 +2,8 @@
 
 return [
 
-    'paginate' => env('PAGINATE', 2),
+    'count_top_bloggers' => 3,
+    'paginate' => env('PAGINATE', 10),
     'max_file_size' => env('MAX_FILE_SIZE', 10485760),
     'primary_key_max_value' => 1000000000,
 

@@ -97,9 +97,19 @@
                                 <div class="col-md-4 mb-3">
                                     <div class="form-group">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" {{isset($article) ? (($article->status == 1) ? 'checked' : '') : ''}} name="status" value="1" id="invalidCheck">
-                                            <label class="form-check-label" for="invalidCheck">
+                                            <input class="form-check-input" type="checkbox" {{isset($article) ? (($article->status == 1) ? 'checked' : '') : ''}} name="status" value="1" id="invalidCheckStatus">
+                                            <label class="form-check-label" for="invalidCheckStatus">
                                                 Active article?
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-group">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" {{isset($article) ? (($article->public == 1) ? 'checked' : '') : ''}} name="public" value="1" id="invalidCheck">
+                                            <label class="form-check-label" for="invalidCheck">
+                                                Public article?
                                             </label>
                                         </div>
                                     </div>

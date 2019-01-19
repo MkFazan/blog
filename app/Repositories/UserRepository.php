@@ -10,6 +10,7 @@ namespace App\Repositories;
 
 
 use App\User;
+use Illuminate\Support\Facades\DB;
 
 class UserRepository
 {
@@ -18,6 +19,14 @@ class UserRepository
      */
     public function getBloggers()
     {
-        return User::with('articles', 'favorite')->whereRole(User::BLOGGER)->get();
+        return User::with('articles', 'favorite')
+            ->whereRole(User::BLOGGER)
+            ->select(
+                array('*', DB::raw('(SELECT count(*) FROM articles WHERE author_id = users.id) as count_articles'))
+            )
+            ->orderBy('count_articles','desc')
+            ->offset(0)
+            ->limit(config('app.count_top_bloggers'))
+            ->get();
     }
 }

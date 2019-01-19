@@ -33,6 +33,7 @@
                                 <th scope="col">Logo</th>
                                 <th scope="col">Name</th>
                                 <th scope="col">Status</th>
+                                <th scope="col">Public</th>
                                 <th scope="col">Categories</th>
                                 <th scope="col" colspan="2"></th>
                             </tr>
@@ -44,6 +45,7 @@
                                     <th><img class="my_style" src="{{$article->logotype->url}}"></th>
                                     <td><a class="btn btn-outline-light btn-sm" href="{{route('blogger.articles.show', ['id' => $article->id])}}">{{$article->name}}</a></td>
                                     <td>{{$article->status == STATUS_ACTIVE ? 'Active' : 'Disable'}}</td>
+                                    <td>{{$article->public == STATUS_ACTIVE ? 'Active' : 'Disable'}}</td>
                                     <td>
                                         <div class="btn-group">
                                             @foreach($article->category as $category)

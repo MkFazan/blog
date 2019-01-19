@@ -32,6 +32,8 @@ class UpdateArticleRequest extends FormRequest
             'categories' => 'required|array|min:1',
             'categories.*' => 'integer|exists:categories,id|max:' . config('app.max_file_size'),
             'logo' => 'file|mimes:jpeg,jpg,png|max:' . config('app.max_file_size'),
+            'status' => 'integer|nullable',
+            'public' => 'integer|nullable',
         ];
     }
 }

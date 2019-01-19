@@ -32,6 +32,8 @@ class StoreArticleRequest extends FormRequest
             'categories' => 'required|array|min:1',
             'categories.*' => 'integer|exists:categories,id|max:' . config('app.max_file_size'),
             'logo' => 'required|file|mimes:jpeg,jpg,png|max:' . config('app.max_file_size'),
+            'status' => 'integer|nullable',
+            'public' => 'integer|nullable',
         ];
     }
 }

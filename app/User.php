@@ -87,8 +87,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Article::class, 'article_favorites');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function articles()
     {
-        return $this->belongsTo(Article::class, 'author_id', 'id');
+        return $this->hasMany(Article::class, 'author_id', 'id');
     }
 }

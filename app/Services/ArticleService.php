@@ -64,6 +64,7 @@ class ArticleService
             $data['logo'] = $image->id;
         }
         $data['status'] = isset($data['status']) ? $data['status'] : 0;
+        $data['public'] = isset($data['public']) ? $data['public'] : 0;
 
         $article->update($data);
 

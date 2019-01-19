@@ -87,7 +87,18 @@ class ArticleRepository
             ->pluck('id')
             ->toArray();
 
-        return Article::with('logotype', 'author')->whereIn('id', $array)->get();
+        if (empty(auth()->user())){
+            return Article::with('logotype', 'author')
+                ->whereIn('id', $array)
+                ->whereStatus(STATUS_ACTIVE)
+                ->wherePublic(STATUS_ACTIVE)
+                ->get();
+        }else{
+            return Article::with('logotype', 'author')
+                ->whereIn('id', $array)
+                ->whereStatus(STATUS_ACTIVE)
+                ->get();
+        }
     }
 
     /**
@@ -100,15 +111,30 @@ class ArticleRepository
         if ($category){
             $article_ids = ArticleCategory::whereCategoryId($category)->pluck('article_id')->toArray();
 
-            return Article::with('gallery', 'logotype', 'author', 'category')
-                ->whereStatus(STATUS_ACTIVE)
-                ->whereIn('id', $article_ids)
-                ->paginate($paginate);
+            if (empty(auth()->user())) {
+                return Article::with('gallery', 'logotype', 'author', 'category')
+                    ->whereStatus(STATUS_ACTIVE)
+                    ->wherePublic(STATUS_ACTIVE)
+                    ->whereIn('id', $article_ids)
+                    ->paginate($paginate);
+            }else{
+                return Article::with('gallery', 'logotype', 'author', 'category')
+                    ->whereStatus(STATUS_ACTIVE)
+                    ->whereIn('id', $article_ids)
+                    ->paginate($paginate);
+            }
 
         }else{
-            return Article::with('gallery', 'logotype', 'author', 'category')
-                ->whereStatus(STATUS_ACTIVE)
-                ->paginate($paginate);
+            if (empty(auth()->user())) {
+                return Article::with('gallery', 'logotype', 'author', 'category')
+                    ->whereStatus(STATUS_ACTIVE)
+                    ->wherePublic(STATUS_ACTIVE)
+                    ->paginate($paginate);
+            }else{
+                return Article::with('gallery', 'logotype', 'author', 'category')
+                    ->whereStatus(STATUS_ACTIVE)
+                    ->paginate($paginate);
+            }
         }
     }
 
@@ -117,11 +143,7 @@ class ArticleRepository
      */
     public function getFavoriteArticles()
     {
-        if(empty(auth()->user())){
-            return [];
-        }else{
-            return auth()->user()->favorite->pluck('id')->toArray();
-        }
+        return empty(auth()->user()) ? [] : auth()->user()->favorite->pluck('id')->toArray();
     }
 
     /**
@@ -144,8 +166,8 @@ class ArticleRepository
      */
     public function getAllArticles()
     {
-        return Article::with('author', 'category')->whereStatus(STATUS_ACTIVE)
-
+        return Article::with('author', 'category')
+            ->whereStatus(STATUS_ACTIVE)
             ->get();
     }
 }

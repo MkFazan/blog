@@ -17,6 +17,7 @@ class Article extends Model
         'parent_id',
         'author_id',
         'status',
+        'public',
     ];
 
     /**
