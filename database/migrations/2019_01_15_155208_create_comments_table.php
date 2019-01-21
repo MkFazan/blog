@@ -19,7 +19,7 @@ class CreateCommentsTable extends Migration
             $table->smallInteger('parent_id')->nullable()->default(null);
             $table->smallInteger('article_id');
             $table->smallInteger('author_id');
-            $table->smallInteger('status')->default(STATUS_ACTIVE);
+            $table->smallInteger('status')->default(STATUS_DISABLED);
 
             $table->timestamps();
         });

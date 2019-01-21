@@ -11,6 +11,7 @@ namespace App\Services;
 
 use App\Models\Comment;
 use App\Repositories\CommentRepository;
+use Illuminate\Support\Facades\DB;
 
 class CommentService
 {
@@ -41,14 +42,44 @@ class CommentService
 
     /**
      * @param Comment $comment
-     * @return string
-     * @throws \Exception
+     * @return array
      */
     public function delete(Comment $comment)
     {
-        $this->commentRepository->deleteChildComments($comment);
-        $this->commentRepository->delete($comment);
+        DB::beginTransaction();
+        try {
+            $this->commentRepository->deleteChildComments($comment);
+            $this->commentRepository->delete($comment);
 
-        return 'success';
+            DB::commit();
+
+            return ['success', 'Comment deleted!'];
+
+        } catch (\Throwable $e) {
+            DB::rollback();
+
+            return ['error', 'Error! Not found!'];
+        }
+    }
+
+    /**
+     * @param Comment $comment
+     * @return array
+     */
+    public function approve(Comment $comment)
+    {
+        DB::beginTransaction();
+        try {
+            $this->commentRepository->approve($comment);
+
+            DB::commit();
+
+            return ['success', 'Comment approved!'];
+
+        } catch (\Throwable $e) {
+            DB::rollback();
+
+            return ['error', 'Error! Not found!'];
+        }
     }
 }

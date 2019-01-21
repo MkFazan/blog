@@ -5,11 +5,33 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePageRequest;
 use App\Models\Page;
+use App\Repositories\PageRepository;
+use App\Services\PageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PageController extends Controller
 {
+    /**
+     * @var PageRepository
+     */
+    private $pageRepository;
+    /**
+     * @var PageService
+     */
+    private $pageService;
+
+    /**
+     * PageController constructor.
+     * @param PageRepository $pageRepository
+     * @param PageService $pageService
+     */
+    public function __construct(PageRepository $pageRepository, PageService $pageService)
+    {
+        $this->pageRepository = $pageRepository;
+        $this->pageService = $pageService;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -17,9 +39,9 @@ class PageController extends Controller
      */
     public function index()
     {
-        return view('backend.dashboard.page.index', [
-            'pages' => Page::paginate(config('app.paginate')),
-        ]);
+        $pages = $this->pageRepository->getPages(config('app.paginate'));
+
+        return view('backend.dashboard.page.index', compact('pages'));
     }
 
     /**
@@ -29,9 +51,9 @@ class PageController extends Controller
      */
     public function create()
     {
-        return view('backend.dashboard.page.form', [
-            'title' => 'Create ',
-        ]);
+        $title = 'Create ';
+
+        return view('backend.dashboard.page.form', compact('title'));
     }
 
     /**
@@ -42,20 +64,12 @@ class PageController extends Controller
      */
     public function store(StorePageRequest $request)
     {
-        $data = $request->except('_token', '_method');
+        list($status, $message) = $this->pageService->store($request->except('_token', '_method'));
 
-        DB::beginTransaction();
-        try {
-            Page::create($data);
-
-            DB::commit();
-
-            return redirect()->route('pages.index')->with('success', 'Successfully created!');
-
-        } catch (\Throwable $e) {
-            DB::rollback();
-
-            return back()->with('error', 'Error!' . $e);
+        if ($status == 'success'){
+            return redirect()->route('pages.index')->with($status, $message);
+        }else{
+            return back()->with($status, $message);
         }
     }
 
@@ -67,9 +81,7 @@ class PageController extends Controller
      */
     public function show(Page $page)
     {
-        return view('backend.dashboard.page.show', [
-            'page' => $page
-        ]);
+        return view('backend.dashboard.page.show', compact('page'));
     }
 
     /**
@@ -80,10 +92,9 @@ class PageController extends Controller
      */
     public function edit(Page $page)
     {
-        return view('backend.dashboard.page.form', [
-            'title' => 'Edit ',
-            'page' => $page
-        ]);
+        $title = 'Edit ';
+
+        return view('backend.dashboard.page.form', compact('title', 'page'));
     }
 
     /**
@@ -95,22 +106,12 @@ class PageController extends Controller
      */
     public function update(StorePageRequest $request, Page $page)
     {
-        $data = $request->except('_token', '_method');
+        list($status, $message) = $this->pageService->update($page, $request->except('_token', '_method'));
 
-        DB::beginTransaction();
-        try {
-            $data['status'] = isset($data['status']) ? $data['status'] : 0;
-
-            $page->update($data);
-
-            DB::commit();
-
-            return redirect()->route('pages.index')->with('success', 'Successfully updated!');
-
-        } catch (\Throwable $e) {
-            DB::rollback();
-
-            return back()->with('error', 'Error!' . $e);
+        if ($status == 'success'){
+            return redirect()->route('pages.index')->with($status, $message);
+        }else{
+            return back()->with($status, $message);
         }
     }
 
@@ -122,18 +123,12 @@ class PageController extends Controller
      */
     public function destroy(Page $page)
     {
-        DB::beginTransaction();
-        try {
-            $page->delete();
+        list($status, $message) = $this->pageService->destroy($page);
 
-            DB::commit();
-
-            return redirect()->route('pages.index')->with('success', 'Successfully updated!');
-
-        } catch (\Throwable $e) {
-            DB::rollback();
-
-            return back()->with('error', 'Error!' . $e);
+        if ($status == 'success'){
+            return redirect()->route('pages.index')->with($status, $message);
+        }else{
+            return back()->with($status, $message);
         }
     }
 }

@@ -10,13 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class CommentController extends Controller
 {
-    /**
-     * @var CommentRepository
-     */
     private $commentRepository;
-    /**
-     * @var CommentService
-     */
     private $commentService;
 
     /**
@@ -37,9 +31,9 @@ class CommentController extends Controller
      */
     public function index()
     {
-        return view('backend.dashboard.comment.index', [
-            'comments' => $this->commentRepository->getAllComments(),
-        ]);
+        $comments = $this->commentRepository->getAllComments();
+
+        return view('backend.dashboard.comment.index', compact('comments'));
     }
 
     /**
@@ -47,10 +41,10 @@ class CommentController extends Controller
      */
     public function moderation()
     {
-        return view('backend.dashboard.comment.index', [
-            'comments' => $this->commentRepository->getCommentForModerations(),
-            'moderation' => true
-        ]);
+        $comments = $this->commentRepository->getCommentForModerations();
+        $moderation = true;
+
+        return view('backend.dashboard.comment.index', compact('moderation', 'comments'));
     }
 
     /**
@@ -59,19 +53,9 @@ class CommentController extends Controller
      */
     public function approve(Comment $comment)
     {
-        DB::beginTransaction();
-        try {
-            $this->commentRepository->approve($comment);
+        list($status, $message) =  $this->commentService->approve($comment);
 
-            DB::commit();
-
-            return back()->with('success', 'Comment approved!');
-
-        } catch (\Throwable $e) {
-            DB::rollback();
-
-            return back()->with('error', 'Error! Not found!');
-        }
+        return back()->with($status, $message);
     }
 
     /**
@@ -81,18 +65,8 @@ class CommentController extends Controller
      */
     public function destroy(Comment $comment)
     {
-        DB::beginTransaction();
-        try {
-            $this->commentService->delete($comment);
+        list($status, $message) =  $this->commentService->delete($comment);
 
-            DB::commit();
-
-            return back()->with('success', 'Comment deleted!');
-
-        } catch (\Throwable $e) {
-            DB::rollback();
-
-            return back()->with('error', 'Error! Not found!');
-        }
+        return back()->with($status, $message);
     }
 }

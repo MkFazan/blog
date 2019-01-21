@@ -29,4 +29,23 @@ class PageRepository
     {
         return Page::whereSlug($slug)->first();
     }
+
+    /**
+     * @param $paginate
+     * @return mixed
+     */
+    public function getPages($paginate)
+    {
+        return Page::paginate($paginate);
+    }
+
+    /**
+     * @param $data
+     * @return mixed
+     */
+    public function store($data)
+    {
+        return Page::create($data);
+    }
+
 }

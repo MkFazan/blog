@@ -57,6 +57,6 @@ class Article extends Model
      */
     public function comments()
     {
-        return $this->hasMany(Comment::class, 'article_id', 'id')->whereParentId(null);
+        return $this->hasMany(Comment::class, 'article_id', 'id')->whereParentId(null)->whereStatus(STATUS_ACTIVE);
     }
 }
