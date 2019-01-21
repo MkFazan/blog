@@ -233,4 +233,13 @@ class ArticleRepository
     {
         return ArticleCategory::whereArticleId($article)->whereIn('category_id', $categories)->delete();
     }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function getArticleForId($id)
+    {
+        return Article::find($id);
+    }
 }

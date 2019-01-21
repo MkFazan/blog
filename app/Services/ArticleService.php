@@ -135,14 +135,23 @@ class ArticleService
      */
     public function saveImageGallery(Article $article, $img)
     {
-        $image = $this->saveImage($img, $article->name);
+        DB::beginTransaction();
+        try {
+            $image = $this->saveImage($img, $article->name);
 
-        ArticleImage::create([
-            'image_id' => $image->id,
-            'article_id' => $article->id
-        ]);
+            ArticleImage::create([
+                'image_id' => $image->id,
+                'article_id' => $article->id
+            ]);
+            DB::commit();
 
-        return $image;
+            return ['success', 'Save image'];
+
+        } catch (\Throwable $e) {
+            DB::rollback();
+
+            return ['error', 'Error! Not found!'];
+        }
     }
 
     /**
@@ -268,5 +277,25 @@ class ArticleService
         }
 
         return $articles;
+    }
+
+    /**
+     * @param $data
+     * @return array
+     */
+    public function deleteImage($data)
+    {
+        DB::beginTransaction();
+        try {
+            $this->articleRepository->deleteImage($data);
+            DB::commit();
+
+            return ['success', 'Delete image in gallery'];
+
+        } catch (\Throwable $e) {
+            DB::rollback();
+
+            return ['error', 'Error! Not found!'];
+        }
     }
 }

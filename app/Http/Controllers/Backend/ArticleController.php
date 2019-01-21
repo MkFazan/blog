@@ -10,29 +10,27 @@ use App\Http\Requests\UpdateArticleRequest;
 use App\Models\Article;
 use App\Models\Category;
 use App\Repositories\ArticleRepository;
+use App\Repositories\CategoryRepository;
 use App\Services\ArticleService;
 use Illuminate\Support\Facades\DB;
 
 class ArticleController extends Controller
 {
-    /**
-     * @var ArticleService
-     */
     private $articleService;
-    /**
-     * @var ArticleRepository
-     */
     private $articleRepository;
+    private $categoryRepository;
 
     /**
      * ArticleController constructor.
      * @param ArticleService $articleService
      * @param ArticleRepository $articleRepository
+     * @param CategoryRepository $categoryRepository
      */
-    public function __construct(ArticleService $articleService, ArticleRepository $articleRepository)
+    public function __construct(ArticleService $articleService, ArticleRepository $articleRepository, CategoryRepository $categoryRepository)
     {
         $this->articleService = $articleService;
         $this->articleRepository = $articleRepository;
+        $this->categoryRepository = $categoryRepository;
     }
 
     /**
@@ -42,10 +40,10 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        return view('backend.dashboard.article.index', [
-            'articles' => Article::with('logotype', 'gallery', 'category')->paginate(config('app.paginate')),
-            'best' => auth()->user()->favorite->pluck('id')->toArray()
-        ]);
+        $articles = Article::with('logotype', 'gallery', 'category')->paginate(config('app.paginate'));
+        $best = auth()->user()->favorite->pluck('id')->toArray();
+
+        return view('backend.dashboard.article.index', compact('articles', 'best'));
     }
 
     /**
@@ -54,9 +52,9 @@ class ArticleController extends Controller
      */
     public function show(Article $article)
     {
-        return view('backend.dashboard.article.show', [
-            'article' => $article->load('logotype'),
-        ]);
+        $article->load('logotype');
+
+        return view('backend.dashboard.article.show', compact('article'));
     }
 
     /**
@@ -66,11 +64,11 @@ class ArticleController extends Controller
      */
     public function create()
     {
-        return view('backend.dashboard.article.form', [
-            'categories' => Category::pluck('name', 'id'),
-            'nodes' => Category::whereIsRoot()->get(),
-            'title' => 'Create new'
-        ]);
+        $categories = $this->categoryRepository->getCategories();
+        $nodes = $this->categoryRepository->getRootCategories();
+        $title = 'Create new';
+
+        return view('backend.dashboard.article.form', compact('categories', 'nodes', 'title'));
     }
 
     /**
@@ -82,18 +80,12 @@ class ArticleController extends Controller
      */
     public function store(StoreArticleRequest $request)
     {
-        DB::beginTransaction();
-        try {
-            $this->articleService->store($request->except('_token'));
+        list($status, $message) = $this->articleService->store($request->except('_token'));
 
-            DB::commit();
-
-            return redirect()->route('articles.index')->with('success', 'Successfully created!');
-
-        } catch (\Throwable $e) {
-            DB::rollback();
-
-            return back()->with('error', 'Error! Not found!');
+        if($status == 'success'){
+            return redirect()->route('articles.index')->with($status, $message);
+        }else{
+            return back()->with($status, $message);
         }
     }
 
@@ -105,35 +97,28 @@ class ArticleController extends Controller
      */
     public function edit(Article $article)
     {
-        return view('backend.dashboard.article.form', [
-            'categories' => Category::pluck('name', 'id'),
-            'nodes' => Category::whereIsRoot()->get(),
-            'article' => $article,
-            'title' => 'Update '
-        ]);
+        $categories = $this->categoryRepository->getCategories();
+        $nodes = $this->categoryRepository->getRootCategories();
+        $title = 'Update ';
+
+        return view('backend.dashboard.article.form', compact('categories', 'nodes', 'article', 'title'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param StoreArticleRequest $request
+     * @param UpdateArticleRequest $request
      * @param Article $article
      * @return \Illuminate\Http\Response
-     * @throws \Throwable
      */
     public function update(UpdateArticleRequest $request, Article $article)
     {
-        DB::beginTransaction();
-        try {
-            $this->articleService->update($request->except('_token', '_method', 'MAX_FILE_SIZE'), $article);
-            DB::commit();
+        list($status, $message) = $this->articleService->update($request->except('_token', '_method', 'MAX_FILE_SIZE'), $article);
 
-            return redirect()->route('articles.index')->with('success', 'Successfully saved!');
-
-        } catch (\Throwable $e) {
-            DB::rollback();
-
-            return back()->with('error', 'Error! Not found!');
+        if($status == 'success'){
+            return redirect()->route('articles.index')->with($status, $message);
+        }else{
+            return back()->with($status, $message);
         }
     }
 
@@ -144,17 +129,12 @@ class ArticleController extends Controller
      */
     public function destroy(Article $article)
     {
-        DB::beginTransaction();
-        try {
-            $this->articleService->destroy($article);
-            DB::commit();
+        list($status, $message) = $this->articleService->destroy($article);
 
-            return redirect()->route('articles.index')->with('success', 'Article deleted');
-
-        } catch (\Throwable $e) {
-            DB::rollback();
-
-            return back()->with('error', 'Error! Not found!');
+        if($status == 'success'){
+            return redirect()->route('articles.index')->with($status, $message);
+        }else{
+            return back()->with($status, $message);
         }
     }
 
@@ -164,17 +144,12 @@ class ArticleController extends Controller
      */
     public function addImage(AddImageGalleryRequuest $requuest)
     {
-        DB::beginTransaction();
-        try {
-            $image = $this->articleService->saveImageGallery(Article::find($requuest->article), $requuest->file);
-            DB::commit();
+        list($status, $message) = $this->articleService->saveImageGallery($this->articleRepository->getArticleForId($requuest->article), $requuest->file);
 
-            return response()->json(['uploaded' => '/upload/'.$image->name]);
-
-        } catch (\Throwable $e) {
-            DB::rollback();
-
-            return back()->with('error', 'Error! Not found!');
+        if($status == 'success'){
+            return response()->json(['uploaded' => '/upload/'.$status]);
+        }else{
+            return back()->with($status, $message);
         }
     }
 
@@ -184,18 +159,9 @@ class ArticleController extends Controller
      */
     public function deleteImage(DeleteImageRequest $request)
     {
-        DB::beginTransaction();
-        try {
-            $this->articleRepository->deleteImage($request->all());
-            DB::commit();
+        list($status, $message) = $this->articleService->deleteImage($request->all());
 
-            return back()->with('success', 'Delete image in gallery');
-
-        } catch (\Throwable $e) {
-            DB::rollback();
-
-            return back()->with('error', 'Error! Not found!');
-        }
+        return back()->with($status, $message);
     }
 
 }
