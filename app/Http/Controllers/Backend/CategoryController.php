@@ -5,9 +5,31 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Models\Category;
+use App\Repositories\CategoryRepository;
+use App\Services\CategoryService;
 
 class CategoryController extends Controller
 {
+    /**
+     * @var CategoryService
+     */
+    private $categoryService;
+    /**
+     * @var CategoryRepository
+     */
+    private $categoryRepository;
+
+    /**
+     * CategoryController constructor.
+     * @param CategoryService $categoryService
+     * @param CategoryRepository $categoryRepository
+     */
+    public function __construct(CategoryService $categoryService, CategoryRepository $categoryRepository)
+    {
+        $this->categoryService = $categoryService;
+        $this->categoryRepository = $categoryRepository;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -15,10 +37,10 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        return view('backend.dashboard.category.index', [
-            'categories' => Category::whereIsRoot()->paginate(config('app.paginate')),
-            'nodes' => Category::whereIsRoot()->get(),
-        ]);
+        $categories = $this->categoryRepository->getRootCategories(config('app.paginate'));
+        $nodes = $this->categoryRepository->getRootCategories();
+
+        return view('backend.dashboard.category.index', compact('categories', 'nodes'));
     }
 
     /**
@@ -27,10 +49,9 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        return view('backend.dashboard.category.show', [
-            'category' => $category,
-            'nodes' => Category::whereIsRoot()->get(),
-        ]);
+        $nodes = $this->categoryRepository->getRootCategories();
+
+        return view('backend.dashboard.category.show', compact('category', 'nodes'));
     }
 
     /**
@@ -40,11 +61,11 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return view('backend.dashboard.category.form', [
-            'categories' => Category::pluck('name', 'id'),
-            'nodes' => Category::whereIsRoot()->get(),
-            'title' => 'Create new'
-        ]);
+        $categories = $this->categoryRepository->getCategories();
+        $nodes = $this->categoryRepository->getRootCategories();
+        $title = 'Create new';
+
+        return view('backend.dashboard.category.form', compact('categories', 'nodes', 'title'));
     }
 
     /**
@@ -55,9 +76,9 @@ class CategoryController extends Controller
      */
     public function store(StoreCategoryRequest $request)
     {
-        Category::create($request->except('_token'));
+        list($status, $message) = $this->categoryService->store($request->except('_token'));
 
-        return redirect()->route('categories.index')->with('success', 'Successfully created!');
+        return redirect()->route('categories.index')->with($status, $message);
     }
 
     /**
@@ -68,13 +89,12 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        return view('backend.dashboard.category.form', [
-            'categories' => Category::pluck('name', 'id'),
-            'nodes' => Category::whereIsRoot()->get(),
-            'children' => Category::whereDescendantOf($category)->pluck('id')->toArray(),
-            'category' => $category,
-            'title' => 'Create new'
-        ]);
+        $categories = $this->categoryRepository->getCategories();
+        $nodes = $this->categoryRepository->getRootCategories();
+        $children = $this->categoryRepository->getIdChildrenCategoriesForCategory($category);
+        $title = 'Update ';
+
+        return view('backend.dashboard.category.form', compact('categories', 'nodes', 'title', 'children', 'category'));
     }
 
     /**
@@ -86,9 +106,9 @@ class CategoryController extends Controller
      */
     public function update(StoreCategoryRequest $request, Category $category)
     {
-        $category->update($request->except('_token', '_method'));
+        list($status, $message) = $this->categoryService->update($category, $request->except('_token', '_method'));
 
-        return redirect()->route('categories.index')->with('success', 'Successfully saved!');
+        return redirect()->route('categories.index')->with($status, $message);
     }
 
     /**
@@ -98,48 +118,12 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        if ($this->validateForDeleted($category)) {
-            $category->delete();
+        list($status, $message) = $this->categoryService->destroy($category);
 
-            return redirect()->route('categories.index')->with('error', 'Category can not be deleted because it has articles');
-        } else {
-            return back()->with('error', 'Category can not be deleted because it has articles');
+        if ($status == 'success'){
+            return redirect()->route('categories.index')->with($status, $message);
+        }else{
+            return back()->with($status, $message);
         }
-    }
-
-    /**
-     * @param $category
-     * @return bool
-     */
-    public function validateForDeleted($category)
-    {
-        $category->load('article');
-
-        if (count($category->article) == 0 || count($category->descendants)) {
-            $validation = true;
-            foreach ($category->descendants as $child) {
-                $status = $this->getArticleForCategory($child);
-                if (count($status)) {
-                    $validation = false;
-                    break;
-                } else {
-                    $validation = true;
-                }
-            }
-            return $validation;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * @param $category
-     * @return mixed
-     */
-    public function getArticleForCategory($category)
-    {
-        $category->load('article');
-
-        return $category->article;
     }
 }

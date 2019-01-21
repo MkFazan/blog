@@ -22,10 +22,33 @@ class CategoryRepository
     }
 
     /**
+     * @param bool $paginate
      * @return mixed
      */
-    public function getRootCategories()
+    public function getRootCategories($paginate = false)
     {
-        return Category::whereIsRoot()->get();
+        if ($paginate){
+            return Category::whereIsRoot()->paginate($paginate);
+        }else{
+            return Category::whereIsRoot()->get();
+        }
+    }
+
+    /**
+     * @param $data
+     * @return mixed
+     */
+    public function store($data)
+    {
+        return Category::create($data);
+    }
+
+    /**
+     * @param Category $category
+     * @return mixed
+     */
+    public function getIdChildrenCategoriesForCategory(Category $category)
+    {
+        return Category::whereDescendantOf($category)->pluck('id')->toArray();
     }
 }
