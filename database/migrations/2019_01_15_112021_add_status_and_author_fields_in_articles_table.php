@@ -16,7 +16,7 @@ class AddStatusAndAuthorFieldsInArticlesTable extends Migration
     {
         Schema::table('articles', function (Blueprint $table) {
             $table->smallInteger('status')->default(STATUS_ACTIVE);
-            $table->smallInteger('author_id')->default(User::whereRole(User::ADMIN)->first()->id);
+            $table->smallInteger('author_id')->default(1);
         });
     }
 

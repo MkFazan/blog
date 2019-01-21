@@ -48,13 +48,11 @@
                                     <div class="custom-file">
                                         <input type="file" class="custom-file-input" id="validatedCustomFile" name="logo" required>
                                         <label class="custom-file-label" for="validatedCustomFile">Choose file...</label>
-                                        <div class="invalid-feedback">
-                                            @if ($errors->has('logo'))
+                                        @if ($errors->has('logo'))
+                                            <div class="alert" style="color:red;" role="alert">
                                                 {{ $errors->first('logo') }}
-                                            @else
-                                                Example invalid custom file feedback
-                                            @endif
-                                        </div>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -97,7 +95,7 @@
                                 <div class="col-md-4 mb-3">
                                     <div class="form-group">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" {{isset($article) ? (($article->status == 1) ? 'checked' : '') : ''}} name="status" value="1" id="invalidCheckStatus">
+                                            <input class="form-check-input" type="checkbox" {{isset($article) ? (($article->status == 1) ? 'checked' : '') : 'checked'}} name="status" value="1" id="invalidCheckStatus">
                                             <label class="form-check-label" for="invalidCheckStatus">
                                                 Active article?
                                             </label>
@@ -107,7 +105,7 @@
                                 <div class="col-md-4 mb-3">
                                     <div class="form-group">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" {{isset($article) ? (($article->public == 1) ? 'checked' : '') : ''}} name="public" value="1" id="invalidCheck">
+                                            <input class="form-check-input" type="checkbox" {{isset($article) ? (($article->public == 1) ? 'checked' : '') : 'checked'}} name="public" value="1" id="invalidCheck">
                                             <label class="form-check-label" for="invalidCheck">
                                                 Public article?
                                             </label>
@@ -117,16 +115,14 @@
                                 <div class="col-md-4 mb-3">
                                     <label for="validationCustom02">Categories</label>
                                     <select class="js-example-basic-multiple" name="categories[]" multiple="multiple" required>
-                                        <option value="{{null}}">Selected categories ... </option>
+                                        <option value="{{null}}" disabled>Selected categories ... </option>
                                         @php getNodesSelect($nodes, ' - ', isset($article) ? $article->category->pluck('id')->toArray() : []) @endphp
                                     </select>
-                                    <div class="invalid-feedback">
-                                        @if ($errors->has('categories'))
+                                    @if ($errors->has('categories'))
+                                        <div class="alert" style="color:red;" role="alert">
                                             {{ $errors->first('categories') }}
-                                        @else
-                                            Example invalid custom select feedback
-                                        @endif
-                                    </div>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
 

@@ -11,6 +11,7 @@ namespace App\Services;
 
 use App\Models\Article;
 use App\Models\ArticleCategory;
+use App\Models\ArticleFavorite;
 use App\Models\ArticleImage;
 use App\Models\Image;
 use App\Repositories\ArticleRepository;
@@ -40,6 +41,8 @@ class ArticleService
         $image = $this->saveImage($data['logo'], $data['name']);
         $data['logo'] = $image->id;
         $data['author_id'] = auth()->user()->id;
+        $data['status'] = isset($data['status']) ? $data['status'] : 0;
+        $data['public'] = isset($data['public']) ? $data['public'] : 0;
 
         $article = Article::create($data);
         foreach ($data['categories'] as $category) {
@@ -87,10 +90,16 @@ class ArticleService
         return 'success';
     }
 
+    /**
+     * @param Article $article
+     * @return bool|null
+     * @throws \Exception
+     */
     public function destroy(Article $article)
     {
         ArticleCategory::whereArticleId($article->id)->delete();
         ArticleImage::whereArticleId($article->id)->delete();
+        ArticleFavorite::whereArticleId($article->id)->delete();
 
         return $article->delete();
     }

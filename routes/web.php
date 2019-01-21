@@ -17,6 +17,8 @@ Route::group(['prefix' => 'dashboard', 'namespace' => 'Backend'], function (){
     Route::get('/', 'AdminController@index')->name('dashboard');
 
     Route::resource('users', 'UserController');
+    Route::get('confirmation-delete/{user}', 'UserController@confirmationDelete')->name('confirmation.delete');
+    Route::post('delete-information-user', 'UserController@deleteAllInformationForUser')->name('delete.information.user');
     Route::resource('categories', 'CategoryController');
     Route::resource('articles', 'ArticleController');
 

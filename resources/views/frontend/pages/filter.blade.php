@@ -43,7 +43,7 @@
                             <div class="col">
                                 <label for="validationCustom02">Categories</label>
                                 <select class="js-example-basic-multiple" name="categories[]" multiple="multiple">
-                                    <option value="{{null}}">Selected categories ... </option>
+                                    <option value="{{null}}" disabled>Selected categories ... </option>
                                     @php getNodesSelect($nodes, ' - ', []) @endphp
                                 </select>
                             </div>

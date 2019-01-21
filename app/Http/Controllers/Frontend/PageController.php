@@ -102,6 +102,10 @@ class PageController extends Controller
         ]);
     }
 
+    /**
+     * @param $slug
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function page($slug)
     {
         return view('frontend.pages.page_template',[

@@ -29,4 +29,13 @@ class UserRepository
             ->limit(config('app.count_top_bloggers'))
             ->get();
     }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function getUserForId($id)
+    {
+        return User::with('articles', 'favorite')->whereId($id)->first();
+    }
 }

@@ -153,11 +153,13 @@ class ArticleRepository
     public function basicSearch($data)
     {
         return Article::whereStatus(STATUS_ACTIVE)
-            ->where('name', 'like', '%' . $data . '%')
-            ->where('description', 'like', '%' . $data . '%')
-            ->where('meta_title', 'like', '%' . $data . '%')
-            ->where('meta_description', 'like', '%' . $data . '%')
-            ->where('meta_keywords', 'like', '%' . $data . '%')
+            ->where(function ($query) use($data) {
+                $query->orWhere('name', 'like', '%' . $data . '%')
+                    ->orWhere('description', 'like', '%' . $data . '%')
+                    ->orWhere('meta_title', 'like', '%' . $data . '%')
+                    ->orWhere('meta_description', 'like', '%' . $data . '%')
+                    ->orWhere('meta_keywords', 'like', '%' . $data . '%');
+            })
             ->get();
     }
 
@@ -169,5 +171,43 @@ class ArticleRepository
         return Article::with('author', 'category')
             ->whereStatus(STATUS_ACTIVE)
             ->get();
+    }
+
+    /**
+     * @param $data
+     * @return mixed
+     */
+    public function deleteArticles($data)
+    {
+        ArticleCategory::whereIn('article_id', $data)->delete();
+
+        return Article::whereIn('id', $data)->delete();
+    }
+
+    /**
+     * @param $data
+     * @return mixed
+     */
+    public function deleteAllFavoriteForArticles($data)
+    {
+        return ArticleFavorite::whereIn('article_id', $data)->delete();
+    }
+
+    /**
+     * @param $data
+     * @return mixed
+     */
+    public function deleteAllFavoriteForUser($data)
+    {
+        return ArticleFavorite::where('user_id', $data)->delete();
+    }
+
+    /**
+     * @param $data
+     * @return mixed
+     */
+    public function deleteImageRelationsToArticles($data)
+    {
+        return ArticleImage::whereIn('article_id', $data)->delete();
     }
 }

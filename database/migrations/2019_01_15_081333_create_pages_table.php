@@ -16,10 +16,10 @@ class CreatePagesTable extends Migration
         Schema::create('pages', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', 50);
-            $table->text('text');
-            $table->string('meta_description');
-            $table->string('meta_title');
-            $table->string('meta_keywords');
+            $table->text('text', 500);
+            $table->string('meta_description', 150);
+            $table->string('meta_title', 50);
+            $table->string('meta_keywords', 255);
 
             $table->smallInteger('status');
             $table->timestamps();

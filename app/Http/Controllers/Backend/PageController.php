@@ -43,7 +43,7 @@ class PageController extends Controller
     public function store(StorePageRequest $request)
     {
         $data = $request->except('_token', '_method');
-
+        dd($data);
         DB::beginTransaction();
         try {
             Page::create($data);

@@ -16,10 +16,10 @@ class CreateCategoriesTable extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->text('description');
-            $table->string('meta_description');
-            $table->string('meta_title');
-            $table->string('meta_keywords');
+            $table->text('description', 500);
+            $table->string('meta_description', 150);
+            $table->string('meta_title', 50);
+            $table->string('meta_keywords', 255);
 
             $table->nestedSet();
             $table->timestamps();

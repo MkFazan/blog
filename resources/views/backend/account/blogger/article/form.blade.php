@@ -44,24 +44,22 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label for="validationCustom01">Logo image</label>
+                                    <label for="validatedCustomFile">Logo image</label>
                                     <div class="custom-file">
                                         <input type="file" class="custom-file-input" id="validatedCustomFile" name="logo" required>
                                         <label class="custom-file-label" for="validatedCustomFile">Choose file...</label>
-                                        <div class="invalid-feedback">
                                             @if ($errors->has('logo'))
+                                            <div class="alert" style="color:red;" role="alert">
                                                 {{ $errors->first('logo') }}
-                                            @else
-                                                Example invalid custom file feedback
+                                            </div>
                                             @endif
-                                        </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="col-md-4 mb-3">
-                                    <label for="validationCustom01">Meta title</label>
-                                    <input type="text" class="form-control{{ $errors->has('meta_title') ? ' is-invalid' : '' }}" id="validationCustom01" placeholder="Meta title" name="meta_title" value="{{isset($article) ? $article->meta_title : old('meta_title')}}" required>
+                                    <label for="meta_title">Meta title</label>
+                                    <input type="text" class="form-control{{ $errors->has('meta_title') ? ' is-invalid' : '' }}" id="meta_title" placeholder="Meta title" name="meta_title" value="{{isset($article) ? $article->meta_title : old('meta_title')}}" required>
                                     <div class="invalid-feedback">
                                         @if ($errors->has('meta_title'))
                                             {{ $errors->first('meta_title') }}
@@ -71,8 +69,8 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label for="validationCustom01">Meta description</label>
-                                    <input type="text" class="form-control{{ $errors->has('meta_description') ? ' is-invalid' : '' }}" id="validationCustom01" placeholder="Name" name="meta_description" value="{{isset($article) ? $article->meta_description : old('meta_description')}}" required>
+                                    <label for="meta_description">Meta description</label>
+                                    <input type="text" class="form-control{{ $errors->has('meta_description') ? ' is-invalid' : '' }}" id="meta_description" placeholder="Name" name="meta_description" value="{{isset($article) ? $article->meta_description : old('meta_description')}}" required>
                                     <div class="invalid-feedback">
                                         @if ($errors->has('meta_description'))
                                             {{ $errors->first('meta_description') }}
@@ -82,8 +80,8 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label for="validationCustom01">Meta keywords</label>
-                                    <input type="text" class="form-control{{ $errors->has('meta_keywords') ? ' is-invalid' : '' }}" id="validationCustom01" placeholder="Name" name="meta_keywords" value="{{isset($article) ? $article->meta_keywords : old('meta_keywords')}}" required>
+                                    <label for="meta_keywords">Meta keywords</label>
+                                    <input type="text" class="form-control{{ $errors->has('meta_keywords') ? ' is-invalid' : '' }}" id="meta_keywords" placeholder="Name" name="meta_keywords" value="{{isset($article) ? $article->meta_keywords : old('meta_keywords')}}" required>
                                     <div class="invalid-feedback">
                                         @if ($errors->has('meta_keywords'))
                                             {{ $errors->first('meta_keywords') }}
@@ -97,7 +95,7 @@
                                 <div class="col-md-4 mb-3">
                                     <div class="form-group">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" {{isset($article) ? (($article->status == 1) ? 'checked' : '') : ''}} name="status" value="1" id="invalidCheckStatus">
+                                            <input class="form-check-input" type="checkbox" {{isset($article) ? (($article->status == 1) ? 'checked' : '') : 'checked'}} name="status" value="1" id="invalidCheckStatus">
                                             <label class="form-check-label" for="invalidCheckStatus">
                                                 Active article?
                                             </label>
@@ -107,7 +105,7 @@
                                 <div class="col-md-4 mb-3">
                                     <div class="form-group">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" {{isset($article) ? (($article->public == 1) ? 'checked' : '') : ''}} name="public" value="1" id="invalidCheck">
+                                            <input class="form-check-input" type="checkbox" {{isset($article) ? (($article->public == 1) ? 'checked' : '') : 'checked'}} name="public" value="1" id="invalidCheck">
                                             <label class="form-check-label" for="invalidCheck">
                                                 Public article?
                                             </label>
@@ -115,18 +113,16 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label for="validationCustom02">Categories</label>
-                                    <select class="js-example-basic-multiple" name="categories[]" multiple="multiple" required>
-                                        <option value="{{null}}">Selected categories ... </option>
+                                    <label for="categories">Categories</label>
+                                    <select class="js-example-basic-multiple" name="categories[]" id="categories" multiple="multiple" required>
+                                        <option value="{{null}}" disabled>Selected categories ... </option>
                                         @php getNodesSelect($nodes, ' - ', isset($article) ? $article->category->pluck('id')->toArray() : []) @endphp
                                     </select>
-                                    <div class="invalid-feedback">
                                         @if ($errors->has('categories'))
+                                            <div class="alert" style="color:red;" role="alert">
                                             {{ $errors->first('categories') }}
-                                        @else
-                                            Example invalid custom select feedback
+                                            </div>
                                         @endif
-                                    </div>
                                 </div>
                             </div>
 
