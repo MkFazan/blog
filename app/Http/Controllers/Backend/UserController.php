@@ -8,7 +8,6 @@ use App\Http\Requests\UserUpdateRequest;
 use App\Services\UserService;
 use App\User;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -180,12 +179,17 @@ class UserController extends Controller
     {
         DB::beginTransaction();
         try {
-            $message = $this->userService->deleteAllInformationForUser($request->except('_token'));
+            if (Hash::check($request->password, auth()->user()->password)){
+                $message = $this->userService->deleteAllInformationForUser($request->except('_token'));
 
-            DB::commit();
+                DB::commit();
 
-            return redirect()->route('users.index')->with('success', $message);
+                return redirect()->route('users.index')->with('success', $message);
+            }else{
+                DB::commit();
 
+                return back()->with('error', 'wrong password');
+            }
         } catch (\Throwable $e) {
             DB::rollback();
 

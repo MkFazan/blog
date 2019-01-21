@@ -7,13 +7,15 @@
             <div class="card-header d-flex p-0">
                 <h3 class="card-title p-3">
                     <i class="fa fa-pie-chart mr-1"></i>
-                    {{$title . ' '}}user
+                    {{$title . ' '}}user: #{{$user->name}}
                 </h3>
             </div>
             <div class="card-header d-flex p-0">
+                @if(!is_null($message))
                 <div class="alert alert-warning" role="alert">
                     {{$message}}
                 </div>
+                @endif
             </div>
             <div class="card-body">
                 <form method="post" action="{{route('delete.information.user')}}">

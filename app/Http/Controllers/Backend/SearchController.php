@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\BasicSearchRequest;
+use App\Http\Requests\FilterRequest;
 use App\Models\Category;
 use App\Repositories\ArticleRepository;
 use App\Services\ArticleService;
-use Illuminate\Http\Request;
 
 class SearchController extends Controller
 {
@@ -31,10 +32,10 @@ class SearchController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param BasicSearchRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function basicSearch(Request $request)
+    public function basicSearch(BasicSearchRequest $request)
     {
         $query = $request->q;
 
@@ -42,10 +43,10 @@ class SearchController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param FilterRequest $request
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function filter(Request $request)
+    public function filter(FilterRequest $request)
     {
         $articles = $this->articleService->filter($request->all());
 
