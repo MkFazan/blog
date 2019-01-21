@@ -80,4 +80,15 @@ class CommentRepository
     {
         return Comment::whereParentId($comment->id)->delete();
     }
+
+    /**
+     * @param $user
+     * @return mixed
+     */
+    public function deleteAllCommentsAndTheirResponsesForUser($user)
+    {
+        $comments = Comment::where('author_id', $user)->pluck('id')->toArray();
+
+        return Comment::whereIn('id', $comments)->orWhereIn('parent_id', $comments)->delete();
+    }
 }

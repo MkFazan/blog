@@ -10,28 +10,26 @@ namespace App\Services;
 
 
 use App\Repositories\ArticleRepository;
+use App\Repositories\CommentRepository;
 use App\Repositories\UserRepository;
 
 class UserService
 {
-    /**
-     * @var UserRepository
-     */
     private $userRepository;
-    /**
-     * @var ArticleRepository
-     */
     private $articleRepository;
+    private $commentRepository;
 
     /**
      * UserService constructor.
      * @param UserRepository $userRepository
      * @param ArticleRepository $articleRepository
+     * @param CommentRepository $commentRepository
      */
-    public function __construct(UserRepository $userRepository, ArticleRepository $articleRepository)
+    public function __construct(UserRepository $userRepository, ArticleRepository $articleRepository, CommentRepository $commentRepository)
     {
         $this->userRepository = $userRepository;
         $this->articleRepository = $articleRepository;
+        $this->commentRepository = $commentRepository;
     }
 
     /**
@@ -46,6 +44,7 @@ class UserService
         $this->articleRepository->deleteAllFavoriteForArticles($articles);
         $this->articleRepository->deleteAllFavoriteForUser($user->id);
         $this->articleRepository->deleteImageRelationsToArticles($articles);
+        $this->commentRepository->deleteAllCommentsAndTheirResponsesForUser($user->id);
         $user->delete();
 
         return 'Success delete all information in user!';
