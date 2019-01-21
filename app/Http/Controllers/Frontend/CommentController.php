@@ -6,7 +6,6 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCommentRequest;
 use App\Services\CommentService;
-use Illuminate\Support\Facades\DB;
 
 class CommentController extends Controller
 {

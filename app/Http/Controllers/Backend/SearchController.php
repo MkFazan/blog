@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BasicSearchRequest;
 use App\Http\Requests\FilterRequest;
-use App\Models\Category;
 use App\Repositories\ArticleRepository;
 use App\Repositories\CategoryRepository;
 use App\Services\ArticleService;

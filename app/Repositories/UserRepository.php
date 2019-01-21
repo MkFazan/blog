@@ -38,4 +38,13 @@ class UserRepository
     {
         return User::with('articles', 'favorite')->whereId($id)->first();
     }
+
+    /**
+     * @param $data
+     * @return mixed
+     */
+    public function store($data)
+    {
+        return User::create($data);
+    }
 }

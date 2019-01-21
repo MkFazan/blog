@@ -7,8 +7,6 @@ use App\Http\Requests\StorePageRequest;
 use App\Models\Page;
 use App\Repositories\PageRepository;
 use App\Services\PageService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class PageController extends Controller
 {

@@ -5,26 +5,25 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Requests\DeleteUserInformationRequest;
 use App\Http\Requests\UserSaveRequest;
 use App\Http\Requests\UserUpdateRequest;
+use App\Repositories\UserRepository;
 use App\Services\UserService;
 use App\User;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    /**
-     * @var UserService
-     */
     private $userService;
+    private $userRepository;
 
     /**
      * UserController constructor.
      * @param UserService $userService
+     * @param UserRepository $userRepository
      */
-    public function __construct(UserService $userService)
+    public function __construct(UserService $userService, UserRepository $userRepository)
     {
         $this->userService = $userService;
+        $this->userRepository = $userRepository;
     }
 
     /**
@@ -37,10 +36,7 @@ class UserController extends Controller
         $roles = User::$allUserRoles;
         $users = User::paginate(config('app.paginate'));
 
-        return view('backend.dashboard.user.index',[
-            'users' => $users,
-            'roles' => $roles
-        ]);
+        return view('backend.dashboard.user.index', compact('users', 'roles'));
     }
 
     /**
@@ -50,10 +46,10 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('backend.dashboard.user.form',[
-            'title' => 'Create new',
-            'roles' =>User::$allUserRoles
-        ]);
+        $title = 'Create new';
+        $roles = User::$allUserRoles;
+
+        return view('backend.dashboard.user.form', compact('title', 'roles'));
     }
 
     /**
@@ -64,20 +60,12 @@ class UserController extends Controller
      */
     public function store(UserSaveRequest $request)
     {
-        $data = $request->all();
-        DB::beginTransaction();
-        try {
-            $data['password'] = Hash::make($data['password']);
-            User::create($data);
+        list($status, $message) = $this->userService->store($request->all());
 
-            DB::commit();
-
-            return redirect()->route('users.index')->with('success', 'User created!');
-
-        } catch (\Throwable $e) {
-            DB::rollback();
-
-            return back()->with('error', 'Error! Not found!');
+        if ($status == 'success'){
+            return redirect()->route('users.index')->with($status, $message);
+        }else{
+            return back()->with($status, $message);
         }
     }
 
@@ -89,11 +77,10 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        return view('backend.dashboard.user.form',[
-            'title' => 'Edit new',
-            'roles' =>User::$allUserRoles,
-            'user' => $user
-        ]);
+        $title = 'Edit new';
+        $roles =User::$allUserRoles;
+
+        return view('backend.dashboard.user.form', compact('title', 'roles', 'user'));
     }
 
     /**
@@ -105,26 +92,12 @@ class UserController extends Controller
      */
     public function update(UserUpdateRequest $request, User $user)
     {
-        $data = $request->except('_token', '_method');
+        list($status, $message) = $this->userService->update($user, $request->except('_token', '_method'));
 
-        DB::beginTransaction();
-        try {
-            if (Hash::check($data['current_password'], $user->password)){
-
-                $data['status'] = isset($data['status']) ? $data['status'] : 0;
-
-                $user->update($data);
-
-                DB::commit();
-
-                return redirect()->route('users.index')->with('success', 'User created!');
-            }else{
-                return back()->with('error', 'Error! Current password failed!');
-            }
-        } catch (\Throwable $e) {
-            DB::rollback();
-
-            return back()->with('error', 'Error!' . $e);
+        if ($status == 'success'){
+            return redirect()->route('users.index')->with($status, $message);
+        }else{
+            return back()->with($status, $message);
         }
     }
 
@@ -137,24 +110,16 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        DB::beginTransaction();
-        try {
-            $user->load('articles', 'favorite');
+        list($status, $message) = $this->userService->destroy($user);
 
-            if (count($user->articles) > 0 or count($user->favorite) > 0)
-            {
-                return redirect()->route('confirmation.delete', ['user' => $user->id])->with('warning', 'The user has articles. Are you sure you want to erase all data linking to it? Operation is not possible to roll back!');
-            }
-            $user->delete();
+        if ($status == 'redirect'){
+            return redirect()->route('confirmation.delete', ['user' => $user->id])->with('warning', 'The user has articles. Are you sure you want to erase all data linking to it? Operation is not possible to roll back!');
+        }
 
-            DB::commit();
-
-            return redirect()->route('users.index')->with('success', 'Used deleted!');
-
-        } catch (\Throwable $e) {
-            DB::rollback();
-
-            return back()->with('error', 'Error!' . $e);
+        if ($status == 'success'){
+            return redirect()->route('users.index')->with($status, $message);
+        }else{
+            return back()->with($status, $message);
         }
     }
 
@@ -164,11 +129,11 @@ class UserController extends Controller
      */
     public function confirmationDelete($id)
     {
-        return view('backend.dashboard.user.confirmation_delete',[
-            'user' => User::find($id),
-            'title' => 'Delete ',
-            'message' => session('warning')
-        ]);
+        $user = $this->userRepository->getUserForId($id);
+        $title = 'Delete ';
+        $message = session('warning');
+
+        return view('backend.dashboard.user.confirmation_delete', compact('user', 'title', 'message'));
     }
 
     /**
@@ -177,23 +142,12 @@ class UserController extends Controller
      */
     public function deleteAllInformationForUser(DeleteUserInformationRequest $request)
     {
-        DB::beginTransaction();
-        try {
-            if (Hash::check($request->password, auth()->user()->password)){
-                $message = $this->userService->deleteAllInformationForUser($request->except('_token'));
+        list($status, $message) = $this->userService->deleteAllInformationForUser($request->except('_token'));
 
-                DB::commit();
-
-                return redirect()->route('users.index')->with('success', $message);
-            }else{
-                DB::commit();
-
-                return back()->with('error', 'wrong password');
-            }
-        } catch (\Throwable $e) {
-            DB::rollback();
-
-            return back()->with('error', 'Error! Not found!');
+        if ($status == 'success'){
+            return redirect()->route('users.index')->with($status, $message);
+        }else{
+            return back()->with($status, $message);
         }
     }
 }
