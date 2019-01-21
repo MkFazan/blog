@@ -15,21 +15,23 @@ use App\Models\ArticleFavorite;
 use App\Models\ArticleImage;
 use App\Models\Image;
 use App\Repositories\ArticleRepository;
+use App\Repositories\CommentRepository;
+use Illuminate\Support\Facades\DB;
 
 class ArticleService
 {
-    /**
-     * @var ArticleRepository
-     */
     private $articleRepository;
+    private $commentRepository;
 
     /**
      * ArticleService constructor.
      * @param ArticleRepository $articleRepository
+     * @param CommentRepository $commentRepository
      */
-    public function __construct(ArticleRepository $articleRepository)
+    public function __construct(ArticleRepository $articleRepository, CommentRepository $commentRepository)
     {
         $this->articleRepository = $articleRepository;
+        $this->commentRepository = $commentRepository;
     }
 
     /**
@@ -38,70 +40,92 @@ class ArticleService
      */
     public function store($data)
     {
-        $image = $this->saveImage($data['logo'], $data['name']);
-        $data['logo'] = $image->id;
-        $data['author_id'] = auth()->user()->id;
-        $data['status'] = isset($data['status']) ? $data['status'] : 0;
-        $data['public'] = isset($data['public']) ? $data['public'] : 0;
+        DB::beginTransaction();
+        try {
+            $image = $this->saveImage($data['logo'], $data['name']);
+            $data['logo'] = $image->id;
+            $data['author_id'] = auth()->user()->id;
+            $data['status'] = isset($data['status']) ? $data['status'] : 0;
+            $data['public'] = isset($data['public']) ? $data['public'] : 0;
 
-        $article = Article::create($data);
-        foreach ($data['categories'] as $category) {
-            ArticleCategory::create([
-                'article_id' => $article->id,
-                'category_id' => $category
-            ]);
+            $article = Article::create($data);
+            foreach ($data['categories'] as $category) {
+                $this->articleRepository->createRelationshipArticleCategory($article->id, $category);
+            }
+
+            DB::commit();
+
+            return ['success', 'Successfully created!'];
+
+        } catch (\Throwable $e) {
+            DB::rollback();
+
+            return ['error', 'Error! Not found!'];
         }
-
-        return $article;
     }
 
     /**
      * @param $data
      * @param Article $article
-     * @return string
+     * @return array
      */
     public function update($data, Article $article)
     {
-        if (isset($data['logo'])) {
-            $image = $this->saveImage($data['logo'], $data['name']);
-            $data['logo'] = $image->id;
-        }
-        $data['status'] = isset($data['status']) ? $data['status'] : 0;
-        $data['public'] = isset($data['public']) ? $data['public'] : 0;
-
-        $article->update($data);
-
-        $old_categories = $article->category->pluck('id')->toArray();
-        $new_categories = $data['categories'];
-        foreach ($new_categories as $category) {
-            if (in_array($category, $old_categories) && ($key = array_search($category, $old_categories)) !== false){
-                unset($old_categories[$key]);
-            }else{
-                ArticleCategory::create([
-                    'article_id' => $article->id,
-                    'category_id' => $category
-                ]);
+        DB::beginTransaction();
+        try {
+            if (isset($data['logo'])) {
+                $image = $this->saveImage($data['logo'], $data['name']);
+                $data['logo'] = $image->id;
             }
-        }
-        if (!empty($old_categories)){
-            ArticleCategory::whereArticleId($article->id)->whereIn('category_id', $old_categories)->delete();
-        }
+            $data['status'] = isset($data['status']) ? $data['status'] : 0;
+            $data['public'] = isset($data['public']) ? $data['public'] : 0;
 
-        return 'success';
+            $article->update($data);
+
+            $old_categories = $article->category->pluck('id')->toArray();
+            $new_categories = $data['categories'];
+            foreach ($new_categories as $category) {
+                if (in_array($category, $old_categories) && ($key = array_search($category, $old_categories)) !== false){
+                    unset($old_categories[$key]);
+                }else{
+                    $this->articleRepository->createRelationshipArticleCategory($article->id, $category);
+                }
+            }
+            if (!empty($old_categories)){
+                $this->articleRepository->deleteRelationshipArticleCategories($article->id, $old_categories);
+            }
+
+            DB::commit();
+
+            return ['success', 'Successfully update!'];
+
+        } catch (\Throwable $e) {
+            DB::rollback();
+
+            return ['error', 'Error! Not found!'];
+        }
     }
 
     /**
      * @param Article $article
-     * @return bool|null
-     * @throws \Exception
+     * @return array
      */
     public function destroy(Article $article)
     {
-        ArticleCategory::whereArticleId($article->id)->delete();
-        ArticleImage::whereArticleId($article->id)->delete();
-        ArticleFavorite::whereArticleId($article->id)->delete();
+        DB::beginTransaction();
+        try {
+            $this->articleRepository->deleteImageRelationsToArticles([$article->id]);
+            $this->articleRepository->deleteAllFavoriteForArticles([$article->id]);
+            $this->commentRepository->deleteAllCommentsForArticle($article->id);
+            $this->articleRepository->deleteArticles([$article->id]);
+            DB::commit();
 
-        return $article->delete();
+            return ['success', 'Article deleted'];
+        } catch (\Throwable $e) {
+            DB::rollback();
+
+            return ['error', 'Error! Not found!'];
+        }
     }
 
     /**
@@ -143,20 +167,29 @@ class ArticleService
 
     /**
      * @param Article $article
-     * @return string
+     * @return array
      */
     public function changeFavoriteStatus(Article $article)
     {
-        $status = $this->articleRepository->getFavoriteStatus($article);
+        DB::beginTransaction();
+        try {
+            $status = $this->articleRepository->getFavoriteStatus($article);
 
-        if (is_null($status)){
-            $this->articleRepository->addArticleToFavorite($article);
+            if (is_null($status)){
+                $this->articleRepository->addArticleToFavorite($article);
+                $message = 'Added article to favorite!';
+            }else{
+                $this->articleRepository->deleteArticleToFavorite($article);
+                $message = 'Deleted favorite article!';
+            }
+            DB::commit();
 
-            return 'Added article to favorite!';
-        }else{
-            $this->articleRepository->deleteArticleToFavorite($article);
+            return ['success', $message];
 
-            return 'Deleted favorite article!';
+        } catch (\Throwable $e) {
+            DB::rollback();
+
+            return ['error', 'Error! Not found!'];
         }
     }
 

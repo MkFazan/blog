@@ -91,4 +91,13 @@ class CommentRepository
 
         return Comment::whereIn('id', $comments)->orWhereIn('parent_id', $comments)->delete();
     }
+
+    /**
+     * @param $article
+     * @return mixed
+     */
+    public function deleteAllCommentsForArticle($article)
+    {
+        return Comment::where('article_id', $article)->delete();
+    }
 }

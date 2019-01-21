@@ -8,31 +8,29 @@ use App\Http\Requests\UpdateArticleRequest;
 use App\Models\Article;
 use App\Models\Category;
 use App\Repositories\ArticleRepository;
+use App\Repositories\CategoryRepository;
 use App\Services\ArticleService;
 use Illuminate\Support\Facades\DB;
 
 class AccountController extends Controller
 {
-    /**
-     * @var ArticleService
-     */
     private $articleService;
-    /**
-     * @var ArticleRepository
-     */
     private $articleRepository;
+    private $categoryRepository;
 
     /**
      * Create a new controller instance.
      *
      * @param ArticleService $articleService
      * @param ArticleRepository $articleRepository
+     * @param CategoryRepository $categoryRepository
      */
-    public function __construct(ArticleService $articleService, ArticleRepository $articleRepository)
+    public function __construct(ArticleService $articleService, ArticleRepository $articleRepository, CategoryRepository $categoryRepository)
     {
         $this->middleware('auth');
         $this->articleService = $articleService;
         $this->articleRepository = $articleRepository;
+        $this->categoryRepository = $categoryRepository;
     }
 
     /**
@@ -51,11 +49,10 @@ class AccountController extends Controller
      */
     public function listMyArticle($paginate = false)
     {
-        return view('backend.account.blogger.article.index', [
-            'articles' => $this->articleRepository->getMyArticle($paginate),
-            'title' => 'My articles',
-            'paginate' => $paginate
-        ]);
+        $articles = $this->articleRepository->getMyArticle($paginate);
+        $title = 'My articles';
+
+        return view('backend.account.blogger.article.index', compact('articles', 'title', 'paginate'));
     }
 
     /**
@@ -64,18 +61,9 @@ class AccountController extends Controller
      */
     public function changeStatusFavorite(Article $article)
     {
-        DB::beginTransaction();
-        try {
-            $status = $this->articleService->changeFavoriteStatus($article);
-            DB::commit();
+        list($status, $message) = $this->articleService->changeFavoriteStatus($article);
 
-            return back()->with('success', $status);
-
-        } catch (\Throwable $e) {
-            DB::rollback();
-
-            return back()->with('error', 'Error! Not found!');
-        }
+        return back()->with($status, $message);
     }
 
     /**
@@ -84,11 +72,10 @@ class AccountController extends Controller
      */
     public function listMyFavoriteArticle($paginate = false)
     {
-        return view('backend.account.blogger.article.favorite', [
-            'articles' => $this->articleRepository->getMyFavoriteArticle($paginate),
-            'title' => 'My favorite articles',
-            'paginate' => $paginate
-        ]);
+        $articles = $this->articleRepository->getMyFavoriteArticle($paginate);
+        $title = 'My favorite articles';
+
+        return view('backend.account.blogger.article.favorite', compact('articles', 'title', 'paginate'));
     }
 
     /**
@@ -96,10 +83,10 @@ class AccountController extends Controller
      */
     public function create()
     {
-        return view('backend.account.blogger.article.form', [
-            'nodes' => Category::whereIsRoot()->get(),
-            'title' => 'Create new'
-        ]);
+        $title = 'Create new';
+        $nodes = $this->categoryRepository->getRootCategories();
+
+        return view('backend.account.blogger.article.form', compact('title', 'nodes'));
     }
 
     /**
@@ -108,18 +95,12 @@ class AccountController extends Controller
      */
     public function store(StoreArticleRequest $request)
     {
-        DB::beginTransaction();
-        try {
+        list($status, $message) = $this->articleService->store($request->except('_token'));
 
-           $this->articleService->store($request->except('_token'));
-            DB::commit();
-
-            return redirect()->route('my.article')->with('success', 'Successfully created!');
-
-        } catch (\Throwable $e) {
-            DB::rollback();
-
-            return back()->with('error', 'Error! Not found!');
+        if($status == 'success'){
+            return redirect()->route('my.article')->with($status, $message);
+        }else{
+            return back()->with($status, $message);
         }
     }
 
@@ -131,11 +112,10 @@ class AccountController extends Controller
      */
     public function edit(Article $article)
     {
-        return view('backend.account.blogger.article.form', [
-            'nodes' => Category::whereIsRoot()->get(),
-            'article' => $article,
-            'title' => 'Update '
-        ]);
+        $title = 'Update ';
+        $nodes = $this->categoryRepository->getRootCategories();
+
+        return view('backend.account.blogger.article.form', compact('title', 'nodes', 'article'));
     }
 
     /**
@@ -147,17 +127,12 @@ class AccountController extends Controller
      */
     public function update(UpdateArticleRequest $request, Article $article)
     {
-        DB::beginTransaction();
-        try {
-            $this->articleService->update($request->except('_token', '_method', 'MAX_FILE_SIZE'), $article);
-            DB::commit();
+        list($status, $message) = $this->articleService->update($request->except('_token', '_method', 'MAX_FILE_SIZE'), $article);
 
-            return redirect()->route('my.article')->with('success', 'Successfully saved!');
-
-        } catch (\Throwable $e) {
-            DB::rollback();
-
-            return back()->with('error', 'Error! Not found!');
+        if($status == 'success'){
+            return redirect()->route('my.article')->with($status, $message);
+        }else{
+            return back()->with($status, $message);
         }
     }
 
@@ -168,17 +143,12 @@ class AccountController extends Controller
      */
     public function destroy(Article $article)
     {
-        DB::beginTransaction();
-        try {
-            $this->articleService->destroy($article);
-            DB::commit();
+        list($status, $message) = $this->articleService->destroy($article);
 
-            return redirect()->route('my.article')->with('success', 'Article deleted');
-
-        } catch (\Throwable $e) {
-            DB::rollback();
-
-            return back()->with('error', 'Error! Not found!');
+        if($status == 'success'){
+            return redirect()->route('my.article')->with($status, $message);
+        }else{
+            return back()->with($status, $message);
         }
     }
 
@@ -188,8 +158,8 @@ class AccountController extends Controller
      */
     public function show(Article $article)
     {
-        return view('backend.account.blogger.article.show', [
-            'article' => $article->load('logotype'),
-        ]);
+        $article->load('logotype');
+
+        return view('backend.account.blogger.article.show', compact('article'));
     }
 }

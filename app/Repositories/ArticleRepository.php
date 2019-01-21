@@ -210,4 +210,27 @@ class ArticleRepository
     {
         return ArticleImage::whereIn('article_id', $data)->delete();
     }
+
+    /**
+     * @param $article
+     * @param $category
+     * @return mixed
+     */
+    public function createRelationshipArticleCategory($article, $category)
+    {
+        return ArticleCategory::create([
+            'article_id' => $article,
+            'category_id' => $category
+        ]);
+    }
+
+    /**
+     * @param $article
+     * @param $categories
+     * @return mixed
+     */
+    public function deleteRelationshipArticleCategories($article, $categories)
+    {
+        return ArticleCategory::whereArticleId($article)->whereIn('category_id', $categories)->delete();
+    }
 }

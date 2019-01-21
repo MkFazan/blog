@@ -13,8 +13,19 @@ use App\Models\Category;
 
 class CategoryRepository
 {
+    /**
+     * @return mixed
+     */
     public static function getCategories()
     {
         return Category::pluck('name', 'id');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRootCategories()
+    {
+        return Category::whereIsRoot()->get();
     }
 }
