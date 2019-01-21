@@ -7,28 +7,26 @@ use App\Http\Requests\BasicSearchRequest;
 use App\Http\Requests\FilterRequest;
 use App\Models\Category;
 use App\Repositories\ArticleRepository;
+use App\Repositories\CategoryRepository;
 use App\Services\ArticleService;
 
 class SearchController extends Controller
 {
-    /**
-     * @var ArticleRepository
-     */
     private $articleRepository;
-    /**
-     * @var ArticleService
-     */
     private $articleService;
+    private $categoryRepository;
 
     /**
      * SearchController constructor.
      * @param ArticleRepository $articleRepository
      * @param ArticleService $articleService
+     * @param CategoryRepository $categoryRepository
      */
-    public function __construct(ArticleRepository $articleRepository, ArticleService $articleService)
+    public function __construct(ArticleRepository $articleRepository, ArticleService $articleService, CategoryRepository $categoryRepository)
     {
         $this->articleRepository = $articleRepository;
         $this->articleService = $articleService;
+        $this->categoryRepository = $categoryRepository;
     }
 
     /**
@@ -49,11 +47,9 @@ class SearchController extends Controller
     public function filter(FilterRequest $request)
     {
         $articles = $this->articleService->filter($request->all());
+        $favoriteArticles = $this->articleRepository->getFavoriteArticles();
+        $nodes = $this->categoryRepository->getRootCategories();
 
-        return view('frontend.pages.filter',[
-            'articles' => empty($articles) ? null : $articles,
-            'favoriteArticles' => $this->articleRepository->getFavoriteArticles(),
-            'nodes' => Category::whereIsRoot()->get()
-        ]);
+        return view('frontend.pages.filter', compact('articles', 'favoriteArticles', 'nodes'));
     }
 }

@@ -32,18 +32,8 @@ class CommentController extends Controller
      */
     public function store(StoreCommentRequest $request)
     {
-        DB::beginTransaction();
-        try {
-            $this->commentService->store($request->except('_token'));
+        list($status, $message) = $this->commentService->store($request->except('_token'));
 
-            DB::commit();
-
-            return back()->with('success', 'Comment saved');
-
-        } catch (\Throwable $e) {
-            DB::rollback();
-
-            return back()->with('error', 'Error! Not found!');
-        }
+        return back()->with($status, $message);
     }
 }

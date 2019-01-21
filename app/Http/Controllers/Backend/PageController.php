@@ -12,13 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class PageController extends Controller
 {
-    /**
-     * @var PageRepository
-     */
     private $pageRepository;
-    /**
-     * @var PageService
-     */
     private $pageService;
 
     /**

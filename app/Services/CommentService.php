@@ -35,9 +35,21 @@ class CommentService
      */
     public function store($data)
     {
-        $data['author_id'] = auth()->user()->id;
+        DB::beginTransaction();
+        try {
+            $data['author_id'] = auth()->user()->id;
+            $this->commentRepository->store($data);
 
-        return $this->commentRepository->store($data);
+            DB::commit();
+
+            return ['success', 'Comment saved'];
+
+        } catch (\Throwable $e) {
+            DB::rollback();
+
+            return ['error', 'Error! Not found!'];
+        }
+
     }
 
     /**

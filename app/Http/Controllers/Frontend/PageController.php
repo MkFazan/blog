@@ -50,11 +50,12 @@ class PageController extends Controller
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function home(){
-        return view('frontend.pages.home',[
-            'bestArticles' => $this->articleRepository->getBestArticles(),
-            'bloggers' => $this->userRepository->getBloggers()
-        ]);
+    public function home()
+    {
+        $bestArticles = $this->articleRepository->getBestArticles();
+        $bloggers = $this->userRepository->getBloggers();
+
+        return view('frontend.pages.home', compact('bestArticles', 'bloggers'));
     }
 
     /**
@@ -63,13 +64,12 @@ class PageController extends Controller
      */
     public function categories($paginate = false)
     {
-        return view('frontend.pages.category',[
-            'articles' => $this->articleRepository->getArticlesForCategory($paginate ? $paginate : config('app.paginate'), false),
-            'favoriteArticles' => $this->articleRepository->getFavoriteArticles(),
+        $articles = $this->articleRepository->getArticlesForCategory($paginate ? $paginate : config('app.paginate'), false);
+        $favoriteArticles = $this->articleRepository->getFavoriteArticles();
+        $paginate = $paginate ? $paginate : config('app.paginate');
+        $route = false;
 
-            'paginate' => $paginate ? $paginate : config('app.paginate'),
-            'route' => false
-        ]);
+        return view('frontend.pages.category', compact('articles', 'favoriteArticles', 'paginate', 'route'));
     }
 
     /**
@@ -79,14 +79,12 @@ class PageController extends Controller
      */
     public function category(Category $category, $paginate = false)
     {
-        return view('frontend.pages.category',[
-            'category' => $category,
-            'articles' => $this->articleRepository->getArticlesForCategory($paginate ? $paginate : config('app.paginate'), $category->id),
-            'favoriteArticles' => $this->articleRepository->getFavoriteArticles(),
+        $articles = $this->articleRepository->getArticlesForCategory($paginate ? $paginate : config('app.paginate'), $category->id);
+        $favoriteArticles = $this->articleRepository->getFavoriteArticles();
+        $paginate = $paginate ? $paginate : config('app.paginate');
+        $route = $category->id;
 
-            'paginate' => $paginate ? $paginate : config('app.paginate'),
-            'route' => $category->id
-        ]);
+        return view('frontend.pages.category', compact('articles', 'favoriteArticles', 'paginate', 'route', 'category'));
     }
 
     /**
@@ -95,11 +93,11 @@ class PageController extends Controller
      */
     public function article(Article $article)
     {
-        return view('frontend.pages.article',[
-            'article' => $article->load('gallery', 'logotype', 'author', 'category', 'comments', 'comments.author'),
-            'favoriteArticles' => $this->articleRepository->getFavoriteArticles(),
-            'answerComments' => $this->commentRepository->getAnswers(),
-        ]);
+        $article = $article->load('gallery', 'logotype', 'author', 'category', 'comments', 'comments.author');
+        $favoriteArticles = $this->articleRepository->getFavoriteArticles();
+        $answerComments = $this->commentRepository->getAnswers();
+
+        return view('frontend.pages.article', compact('article', 'favoriteArticles', 'answerComments'));
     }
 
     /**
@@ -108,9 +106,9 @@ class PageController extends Controller
      */
     public function page($slug)
     {
-        return view('frontend.pages.page_template',[
-            'page' => $this->pageRepository->getPageForSlug($slug)
-        ]);
+        $page = $this->pageRepository->getPageForSlug($slug);
+
+        return view('frontend.pages.page_template', compact('page'));
     }
 
 }
