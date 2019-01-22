@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePageRequest;
+use App\Http\Requests\UpdatePageRequest;
 use App\Models\Page;
 use App\Repositories\PageRepository;
 use App\Services\PageService;
@@ -92,11 +93,11 @@ class PageController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param StorePageRequest $request
+     * @param UpdatePageRequest $request
      * @param Page $page
      * @return \Illuminate\Http\Response
      */
-    public function update(StorePageRequest $request, Page $page)
+    public function update(UpdatePageRequest $request, Page $page)
     {
         list($status, $message) = $this->pageService->update($page, $request->except('_token', '_method'));
 
